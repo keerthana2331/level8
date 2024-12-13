@@ -1,3 +1,6 @@
+
+
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -23,25 +26,12 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Carousel Section
             _buildCarousel(),
-            
-            // Categories Section
             _buildCategoriesSection(),
-            
-            // Products Section
-            _buildProductsSection(),
-            
-            // Wishlist Section
+            _buildProductsSection(context),
             _buildWishlistSection(),
-            
-            // Address Section
             _buildAddressSection(),
-            
-            // Cart Section
             _buildCartSection(),
-            
-            // Order Summary Section
             _buildOrderSummarySection(),
           ],
         ),
@@ -79,28 +69,28 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildCategoriesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
             'Categories',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _categoryItem(Icons.phone_android, 'Electronics'),
-              _categoryItem(Icons.checkroom, 'Clothing'),
-              _categoryItem(Icons.book, 'Books'),
-              _categoryItem(Icons.sports, 'Sports'),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _categoryItem(Icons.phone_android, 'Electronics'),
+                _categoryItem(Icons.checkroom, 'Clothing'),
+                _categoryItem(Icons.book, 'Books'),
+                _categoryItem(Icons.sports, 'Sports'),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -120,73 +110,133 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProductsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Popular Products',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _productItem('Product 1', 'https://example.com/product1.jpg', 99.99),
-              _productItem('Product 2', 'https://example.com/product2.jpg', 149.99),
-              _productItem('Product 3', 'https://example.com/product3.jpg', 79.99),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _productItem(String name, String imageUrl, double price) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      width: 150,
+  Widget _buildProductsSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(imageUrl, height: 150, fit: BoxFit.cover),
-          Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-          Text('\$$price', style: TextStyle(color: Colors.green)),
-          ElevatedButton(
-            onPressed: () {
-              // Add to cart functionality
-            },
-            child: Text('Add to Cart'),
+          Text(
+            'Popular Products',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _productItem(context, 'Product 1', 'https://example.com/product1.jpg', 99.99),
+                _productItem(context, 'Product 2', 'https://example.com/product2.jpg', 149.99),
+                _productItem(context, 'Product 3', 'https://example.com/product3.jpg', 79.99),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
+  Widget _productItem(BuildContext context, String name, String imageUrl, double price) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      width: 150,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(imageUrl, height: 150, fit: BoxFit.cover),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('\$$price', style: TextStyle(color: Colors.green)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () {
+                          _showUpdateDialog(context, name);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          // Delete functionality
+                        },
+                      ),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add to cart functionality
+                    },
+                    child: Text('Add to Cart'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showUpdateDialog(BuildContext context, String productName) {
+    TextEditingController _controller = TextEditingController(text: productName);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Update Product'),
+          content: TextField(
+            controller: _controller,
+            decoration: InputDecoration(hintText: "Enter new product name"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Handle update logic here
+                Navigator.of(context).pop();
+              },
+              child: Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildWishlistSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
             'Wishlist',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _wishlistItem('Wishlist Item 1', 'https://example.com/wishlist1.jpg'),
-              _wishlistItem('Wishlist Item 2', 'https://example.com/wishlist2.jpg'),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _wishlistItem('Wishlist Item 1', 'https://example.com/wishlist1.jpg'),
+                _wishlistItem('Wishlist Item 2', 'https://example.com/wishlist2.jpg'),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -194,35 +244,47 @@ class HomeScreen extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8),
       width: 150,
-      child: Column(
-        children: [
-          Image.network(imageUrl, height: 150, fit: BoxFit.cover),
-          Text(name),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: Icon(Icons.remove_circle, color: Colors.red),
-                onPressed: () {
-                  // Remove from wishlist
-                },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          children: [
+            Image.network(imageUrl, height: 150, fit: BoxFit.cover),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove_circle, color: Colors.red),
+                        onPressed: () {
+                          // Remove from wishlist
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.shopping_cart, color: Colors.blue),
+                        onPressed: () {
+                          // Add to cart
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              IconButton(
-                icon: Icon(Icons.shopping_cart, color: Colors.blue),
-                onPressed: () {
-                  // Add to cart
-                },
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildAddressSection() {
-    return Container(
-      padding: EdgeInsets.all(8.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -231,6 +293,8 @@ class HomeScreen extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             child: ListTile(
               title: Text('John Doe'),
               subtitle: Text('123 Main St, City, Country'),
@@ -248,8 +312,8 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildCartSection() {
-    return Container(
-      padding: EdgeInsets.all(8.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -257,13 +321,17 @@ class HomeScreen extends StatelessWidget {
             'Cart',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          ListTile(
-            title: Text('Cart Items: 3'),
-            trailing: ElevatedButton(
-              child: Text('View Cart'),
-              onPressed: () {
-                // Navigate to cart screen
-              },
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: ListTile(
+              title: Text('Cart Items: 3'),
+              trailing: ElevatedButton(
+                child: Text('View Cart'),
+                onPressed: () {
+                  // Navigate to cart screen
+                },
+              ),
             ),
           ),
         ],
@@ -271,9 +339,9 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderSummarySection() {
-    return Container(
-      padding: EdgeInsets.all(8.0),
+   Widget _buildOrderSummarySection() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -282,6 +350,8 @@ class HomeScreen extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -332,7 +402,25 @@ class HomeScreen extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
       onTap: (index) {
-        // Handle navigation
+        // Handle navigation based on selected index
+        switch (index) {
+          case 0:
+            // Navigate to Home
+            Navigator.pushNamed(context, '/home');
+            break;
+          case 1:
+            // Navigate to Wishlist
+            Navigator.pushNamed(context, '/wishlist');
+            break;
+          case 2:
+            // Navigate to Cart
+            Navigator.pushNamed(context, '/cart');
+            break;
+          case 3:
+            // Navigate to Profile
+            Navigator.pushNamed(context, '/profile');
+            break;
+        }
       },
     );
   }
