@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'auth_provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,131 +10,44 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> products = [
-    {
-      'name': 'Wireless Headphones',
-      'imageUrl': 'https://example.com/product1.jpg',
-      'price': 99.99,
-      'rating': 4.5,
-      'reviews': 128
-    },
-    {
-      'name': 'Smart Watch',
-      'imageUrl': 'https://example.com/product2.jpg',
-      'price': 149.99,
-      'rating': 4.8,
-      'reviews': 256
-    },
-    {
-      'name': 'Premium Laptop',
-      'imageUrl': 'https://example.com/product3.jpg',
-      'price': 999.99,
-      'rating': 4.9,
-      'reviews': 512
-    },
+    {'name': 'Product 1', 'imageUrl': 'https://example.com/product1.jpg', 'price': 99.99},
+    {'name': 'Product 2', 'imageUrl': 'https://example.com/product2.jpg', 'price': 149.99},
+    {'name': 'Product 3', 'imageUrl': 'https://example.com/product3.jpg', 'price': 79.99},
   ];
 
-  final categories = ['All', 'Electronics', 'Fashion', 'Books', 'Sports'];
-  String selectedCategory = 'All';
+  TextEditingController productController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: _buildAppBar(context),
+      appBar: AppBar(
+        title: Text('Home'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              Provider.of<AuthProvider>(context, listen: false).logout();
+              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSearchBar(),
             _buildCarousel(),
             _buildCategoriesSection(),
-            _buildFeaturedProducts(),
-            _buildTrendingSection(),
-            _buildNewArrivals(),
+            _buildCrudSection(),
+            _buildProductsSection(context),
+            _buildWishlistSection(),
+            _buildAddressSection(),
+            _buildCartSection(),
+            _buildOrderSummarySection(),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.white,
-      title: Text(
-        'Store',
-        style: GoogleFonts.poppins(
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: Stack(
-            children: [
-              Icon(Icons.shopping_cart_outlined, color: Colors.black87),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: BoxConstraints(
-                    minWidth: 14,
-                    minHeight: 14,
-                  ),
-                  child: Text(
-                    '3',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          onPressed: () {
-            // Navigate to cart
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.favorite_border, color: Colors.black87),
-          onPressed: () {
-            // Navigate to wishlist
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      margin: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Search products...',
-          prefixIcon: Icon(Icons.search, color: Colors.grey),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      ),
+      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -145,251 +57,46 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 200,
         autoPlay: true,
         enlargeCenterPage: true,
-        viewportFraction: 0.9,
-        autoPlayCurve: Curves.fastOutSlowIn,
-        autoPlayAnimationDuration: Duration(milliseconds: 800),
       ),
-      items: [1, 2, 3].map((i) {
-        return Builder(
-          builder: (BuildContext context) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              margin: EdgeInsets.symmetric(horizontal: 5.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF6A11CB),
-                    Color(0xFF2575FC),
-                  ],
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 20,
-                    top: 40,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Special Offer',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Get 30% off',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildCategoriesSection() {
-    return Container(
-      height: 100,
-      margin: EdgeInsets.symmetric(vertical: 16),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () => setState(() => selectedCategory = categories[index]),
-            child: Container(
-              width: 80,
-              margin: EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                color: selectedCategory == categories[index]
-                    ? Theme.of(context).primaryColor
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    _getCategoryIcon(categories[index]),
-                    color: selectedCategory == categories[index]
-                        ? Colors.white
-                        : Colors.grey,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    categories[index],
-                    style: TextStyle(
-                      color: selectedCategory == categories[index]
-                          ? Colors.white
-                          : Colors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case 'Electronics':
-        return Icons.devices;
-      case 'Fashion':
-        return Icons.checkroom;
-      case 'Books':
-        return Icons.book;
-      case 'Sports':
-        return Icons.sports;
-      default:
-        return Icons.category;
-    }
-  }
-
-  Widget _buildFeaturedProducts() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Featured Products',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text('See All'),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 320,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              return _buildProductCard(products[index]);
-            },
-          ),
-        ),
+      items: [
+        _carouselItem('https://example.com/image1.jpg'),
+        _carouselItem('https://example.com/image2.jpg'),
+        _carouselItem('https://example.com/image3.jpg'),
       ],
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product) {
+  Widget _carouselItem(String imageUrl) {
     return Container(
-      width: 200,
-      margin: EdgeInsets.only(right: 16),
+      margin: EdgeInsets.all(5.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(10.0),
+        image: DecorationImage(
+          image: NetworkImage(imageUrl),
+          fit: BoxFit.cover,
+        ),
       ),
+    );
+  }
+
+  Widget _buildCategoriesSection() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Image.network(
-                product['imageUrl'],
-                fit: BoxFit.cover,
-              ),
-            ),
+          Text(
+            'Categories',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          Padding(
-            padding: EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
               children: [
-                Text(
-                  product['name'],
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.amber, size: 16),
-                    SizedBox(width: 4),
-                    Text(
-                      '${product['rating']}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      ' (${product['reviews']})',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Text(
-                  '\$${product['price']}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Add to Cart'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 36),
-                  ),
-                ),
+                _categoryItem(Icons.phone_android, 'Electronics'),
+                _categoryItem(Icons.checkroom, 'Clothing'),
+                _categoryItem(Icons.book, 'Books'),
+                _categoryItem(Icons.sports, 'Sports'),
               ],
             ),
           ),
@@ -398,40 +105,394 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTrendingSection() {
-    // Similar to Featured Products but with different styling
-    return Container();
-  }
-
-  Widget _buildNewArrivals() {
-    // Similar to Featured Products but with different styling
-    return Container();
-  }
-
-  Widget _buildBottomNavigationBar() {
+  Widget _categoryItem(IconData icon, String label) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, -2),
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            child: Icon(icon),
+          ),
+          SizedBox(height: 8),
+          Text(label),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCrudSection() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: productController,
+            decoration: InputDecoration(
+              labelText: 'Enter Product Name',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: _addProduct,
+                child: Text('Add Product'),
+              ),
+              ElevatedButton(
+                onPressed: _updateProduct,
+                child: Text('Update Product'),
+              ),
+              ElevatedButton(
+                onPressed: _deleteProduct,
+                child: Text('Delete Product'),
+              ),
+            ],
           ),
         ],
       ),
-      child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Categories'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+    );
+  }
+
+  void _addProduct() {
+    if (productController.text.isNotEmpty) {
+      setState(() {
+        products.add({
+          'name': productController.text,
+          'imageUrl': 'https://example.com/newproduct.jpg',  // Add default image URL or let users upload images
+          'price': 49.99,  // Set default price or allow users to set
+        });
+        productController.clear();
+      });
+    }
+  }
+
+  void _updateProduct() {
+    if (productController.text.isNotEmpty) {
+      setState(() {
+        products[0] = {
+          'name': productController.text,
+          'imageUrl': 'https://example.com/updatedproduct.jpg',
+          'price': 79.99,
+        };
+        productController.clear();
+      });
+    }
+  }
+
+  void _deleteProduct() {
+    setState(() {
+      products.removeAt(0);  // Deleting the first product (change this to implement specific product deletion)
+    });
+  }
+
+  Widget _buildProductsSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Popular Products',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: products.map((product) {
+                return _productItem(context, product['name'], product['imageUrl'], product['price']);
+              }).toList(),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _productItem(BuildContext context, String name, String imageUrl, double price) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      width: 150,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(imageUrl, height: 150, fit: BoxFit.cover),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('\$$price', style: TextStyle(color: Colors.green)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () {
+                          _showUpdateDialog(context, name);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          // Delete functionality
+                        },
+                      ),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add to cart functionality
+                    },
+                    child: Text('Add to Cart'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showUpdateDialog(BuildContext context, String productName) {
+    TextEditingController _controller = TextEditingController(text: productName);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Update Product'),
+          content: TextField(
+            controller: _controller,
+            decoration: InputDecoration(hintText: "Enter new product name"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Handle update logic here
+                Navigator.of(context).pop();
+              },
+              child: Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildWishlistSection() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Wishlist',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _wishlistItem('Wishlist Item 1', 'https://example.com/wishlist1.jpg'),
+                _wishlistItem('Wishlist Item 2', 'https://example.com/wishlist2.jpg'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _wishlistItem(String name, String imageUrl) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      width: 150,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          children: [
+            Image.network(imageUrl, height: 150, fit: BoxFit.cover),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove_circle, color: Colors.red),
+                        onPressed: () {
+                          // Remove from wishlist
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.shopping_cart, color: Colors.blue),
+                        onPressed: () {
+                          // Add to cart
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddressSection() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Delivery Address',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: ListTile(
+              title: Text('John Doe'),
+              subtitle: Text('123 Main St, City, Country'),
+              trailing: TextButton(
+                child: Text('Change'),
+                onPressed: () {
+                  // Navigate to address management
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCartSection() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Cart',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: ListTile(
+              title: Text('Cart Items: 3'),
+              trailing: ElevatedButton(
+                child: Text('View Cart'),
+                onPressed: () {
+                  // Navigate to cart screen
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrderSummarySection() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Order Summary',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  _summaryRow('Subtotal', '\$299.97'),
+                  _summaryRow('Shipping', '\$10.00'),
+                  _summaryRow('Tax', '\$24.00'),
+                  Divider(),
+                  _summaryRow('Total', '\$333.97', isBold: true),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _summaryRow(String label, String value, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return BottomNavigationBar(
+      items: [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Wishlist'),
+        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+      ],
+      onTap: (index) {
+        switch (index) {
+          case 0:
+            Navigator.pushNamed(context, '/home');
+            break;
+          case 1:
+            Navigator.pushNamed(context, '/wishlist');
+            break;
+          case 2:
+            Navigator.pushNamed(context, '/cart');
+            break;
+          case 3:
+            Navigator.pushNamed(context, '/profile');
+            break;
+        }
+      },
     );
   }
 }
