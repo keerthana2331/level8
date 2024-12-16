@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,7 +11,6 @@ class FirstScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Gradient with Circular Overlay
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -60,9 +61,10 @@ class FirstScreen extends StatelessWidget {
                         color: Colors.white,
                         letterSpacing: 1.5,
                       ),
-                    ).animate()
-                      .fadeIn(duration: Duration(milliseconds: 800))
-                      .slideY(begin: -0.5, end: 0),
+                    )
+                        .animate()
+                        .fadeIn(duration: Duration(milliseconds: 800))
+                        .slideY(begin: -0.5, end: 0),
 
                     SizedBox(height: 40),
 
@@ -71,14 +73,27 @@ class FirstScreen extends StatelessWidget {
                       context,
                       text: 'Sign Up',
                       icon: IconlyBold.add_user,
-                      onPressed: () => Navigator.pushNamed(context, '/signup'),
+                      onPressed: () {
+                        print('Sign-Up button clicked'); // Debugging message
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Navigating to Sign-Up page...'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        Navigator.pushNamed(context, '/signup');
+                      },
                       colors: [
                         Color(0xFFFF6B6B),
                         Color(0xFFFFA726),
                       ],
-                    ).animate()
-                      .fadeIn(duration: Duration(milliseconds: 600))
-                      .scaleXY(begin: 0.8, end: 1, duration: Duration(milliseconds: 400)),
+                    )
+                        .animate()
+                        .fadeIn(duration: Duration(milliseconds: 600))
+                        .scaleXY(
+                            begin: 0.8,
+                            end: 1,
+                            duration: Duration(milliseconds: 400)),
 
                     SizedBox(height: 20),
 
@@ -92,9 +107,16 @@ class FirstScreen extends StatelessWidget {
                         Color(0xFF4CAF50),
                         Color(0xFF2196F3),
                       ],
-                    ).animate()
-                      .fadeIn(duration: Duration(milliseconds: 600), delay: Duration(milliseconds: 200))
-                      .scaleXY(begin: 0.8, end: 1, duration: Duration(milliseconds: 400), delay: Duration(milliseconds: 200)),
+                    )
+                        .animate()
+                        .fadeIn(
+                            duration: Duration(milliseconds: 600),
+                            delay: Duration(milliseconds: 200))
+                        .scaleXY(
+                            begin: 0.8,
+                            end: 1,
+                            duration: Duration(milliseconds: 400),
+                            delay: Duration(milliseconds: 200)),
                   ],
                 ),
               ),

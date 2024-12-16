@@ -10,14 +10,14 @@ class OTPScreen extends StatefulWidget {
 
 class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMixin {
   final List<TextEditingController> _otpControllers = List.generate(
-    6,
+    4,
     (index) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(
-    6,
+    4,
     (index) => FocusNode(),
   );
-  
+
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   Timer? _timer;
@@ -73,7 +73,7 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
 
   void _verifyOtp(BuildContext context, String email) {
     final otp = getOtp();
-    if (otp.length != 6) {
+    if (otp.length != 4) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please enter complete OTP'),
@@ -101,7 +101,7 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final email = ModalRoute.of(context)!.settings.arguments as String;
-    
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -189,9 +189,9 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: List.generate(
-                              6,
+                              4,
                               (index) => SizedBox(
-                                width: 45,
+                                width: 55,
                                 child: TextFormField(
                                   controller: _otpControllers[index],
                                   focusNode: _focusNodes[index],
@@ -210,7 +210,7 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
                                   textAlign: TextAlign.center,
                                   maxLength: 1,
                                   onChanged: (value) {
-                                    if (value.length == 1 && index < 5) {
+                                    if (value.length == 1 && index < 3) {
                                       _focusNodes[index + 1].requestFocus();
                                     }
                                   },
@@ -222,7 +222,7 @@ class _OTPScreenState extends State<OTPScreen> with SingleTickerProviderStateMix
                           ElevatedButton(
                             onPressed: () => _verifyOtp(context, email),
                             style: ElevatedButton.styleFrom(
-                              iconColor: Color(0xFF1E3C72),
+                              backgroundColor: Color(0xFF1E3C72),
                               padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),

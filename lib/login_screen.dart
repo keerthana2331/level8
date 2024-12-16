@@ -2,7 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'auth_provider.dart';
+
+class Loguser {
+  final String email;
+  final String password;
+
+  Loguser({required this.email, required this.password});
+
+  Map<String, dynamic> toJson() => {
+        'email': email,
+        'password': password,
+      };
+
+  static Loguser fromJson(Map<String, dynamic> json) {
+    return Loguser(
+      email: json['email'],
+      password: json['password'],
+    );
+  }
+
+  @override
+  String toString() => 'Loguser(email: $email, password: ****)';
+}
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -17,10 +40,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  
-  // Keys for SharedPreferences
-  static const String EMAIL_KEY = 'temp_login_email';
-  static const String PASSWORD_KEY = 'temp_login_password';
+
+  static const String LOGIN_USER_KEY = 'login_user';
 
   @override
   void initState() {
@@ -51,22 +72,28 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
   Future<void> _loadSavedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _emailController.text = prefs.getString(EMAIL_KEY) ?? '';
-      _passwordController.text = prefs.getString(PASSWORD_KEY) ?? '';
-    });
+    final userJson = prefs.getString(LOGIN_USER_KEY);
+    if (userJson != null) {
+      final user = Loguser.fromJson(jsonDecode(userJson));
+      setState(() {
+        _emailController.text = user.email;
+        _passwordController.text = user.password;
+      });
+    }
   }
 
   Future<void> _saveCredentials() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(EMAIL_KEY, _emailController.text);
-    await prefs.setString(PASSWORD_KEY, _passwordController.text);
+    final user = Loguser(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+    await prefs.setString(LOGIN_USER_KEY, jsonEncode(user.toJson()));
   }
 
   Future<void> _clearCredentials() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(EMAIL_KEY);
-    await prefs.remove(PASSWORD_KEY);
+    await prefs.remove(LOGIN_USER_KEY);
   }
 
   @override
@@ -99,19 +126,20 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
   Future<void> _handleLogin(BuildContext context, AuthProvider authProvider) async {
     if (_formKey.currentState!.validate()) {
+      final logUser = Loguser(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
       if (!authProvider.isOtpVerified) {
-        await _saveCredentials(); // Save credentials before navigating to OTP
+        await _saveCredentials();
         Navigator.pushReplacementNamed(
           context,
-          '/otp',  // Use pushReplacementNamed to replace the current screen
-          arguments: _emailController.text,
+          '/otp',
+          arguments: logUser.email,
         );
       } else {
-        await _clearCredentials(); // Clear saved credentials after successful login
-        authProvider.login(
-          _emailController.text,
-          _passwordController.text,
-        );
+        await _clearCredentials();
+        authProvider.login(logUser.email, logUser.password);
         Navigator.pushReplacementNamed(context, '/home');
       }
     }
@@ -120,13 +148,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        // Removed leading property to remove the back arrow
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -241,28 +268,40 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 ),
                               ),
                               SizedBox(height: 20),
-                              ElevatedButton(
-                                onPressed: () => _handleLogin(context, authProvider),
-                                style: ElevatedButton.styleFrom(
-                                  iconColor: Color(0xFF4A00E0),
-                                  disabledIconColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 50,
-                                    vertical: 15,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Login',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          ElevatedButton(
+  onPressed: () async {
+    if (_formKey.currentState!.validate()) {
+      // Create an instance of Loguser with the entered email and password
+      final loguser = Loguser(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      // Print the Loguser instance to confirm the values
+      print('Loguser instance created: $loguser');
+
+      // Proceed with the existing login handling
+      await _handleLogin(context, authProvider);
+    }
+  },
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.symmetric(
+      horizontal: 50,
+      vertical: 15,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(30),
+    ),
+  ),
+  child: Text(
+    'Login',
+    style: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
+                     ],
                           ),
                         ),
                       ),

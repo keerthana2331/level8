@@ -1,6 +1,7 @@
+// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'auth_provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,18 +11,33 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> products = [
-    {'name': 'Product 1', 'imageUrl': 'https://example.com/product1.jpg', 'price': 99.99},
-    {'name': 'Product 2', 'imageUrl': 'https://example.com/product2.jpg', 'price': 149.99},
-    {'name': 'Product 3', 'imageUrl': 'https://example.com/product3.jpg', 'price': 79.99},
+    {'name': 'Product 1', 'price': 99.99},
+    {'name': 'Product 2', 'price': 149.99},
+    {'name': 'Product 3', 'price': 79.99},
   ];
 
-  TextEditingController productController = TextEditingController();
+  final TextEditingController productNameController = TextEditingController();
+  final TextEditingController productPriceController = TextEditingController();
+  int? editingIndex;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: Text(
+          'Product Manager',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.pinkAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
@@ -32,467 +48,256 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue.shade300, Colors.purple.shade300],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildCarousel(),
-            _buildCategoriesSection(),
-            _buildCrudSection(),
-            _buildProductsSection(context),
-            _buildWishlistSection(),
-            _buildAddressSection(),
-            _buildCartSection(),
-            _buildOrderSummarySection(),
+            SizedBox(height: 20),
+            _buildFeatureIcons(),
+            Expanded(
+              child: _buildProductManager(),
+            ),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
-    );
-  }
-
-  Widget _buildCarousel() {
-    return CarouselSlider(
-      options: CarouselOptions(
-        height: 200,
-        autoPlay: true,
-        enlargeCenterPage: true,
-      ),
-      items: [
-        _carouselItem('https://example.com/image1.jpg'),
-        _carouselItem('https://example.com/image2.jpg'),
-        _carouselItem('https://example.com/image3.jpg'),
-      ],
-    );
-  }
-
-  Widget _carouselItem(String imageUrl) {
-    return Container(
-      margin: EdgeInsets.all(5.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        image: DecorationImage(
-          image: NetworkImage(imageUrl),
-          fit: BoxFit.cover,
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _startEdit(null),
+        child: Icon(Icons.add),
+        backgroundColor: Colors.deepPurple,
       ),
     );
   }
 
-  Widget _buildCategoriesSection() {
+  Widget _buildFeatureIcons() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text(
-            'Categories',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _categoryItem(Icons.phone_android, 'Electronics'),
-                _categoryItem(Icons.checkroom, 'Clothing'),
-                _categoryItem(Icons.book, 'Books'),
-                _categoryItem(Icons.sports, 'Sports'),
-              ],
-            ),
-          ),
+          _iconWithLabel(Icons.category, 'Categories'),
+          _iconWithLabel(Icons.favorite, 'Wishlist'),
+          _iconWithLabel(Icons.location_on, 'Address'),
+          _iconWithLabel(Icons.shopping_cart, 'Cart'),
+          _iconWithLabel(Icons.summarize, 'Summary'),
         ],
       ),
     );
   }
 
-  Widget _categoryItem(IconData icon, String label) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            child: Icon(icon),
-          ),
-          SizedBox(height: 8),
-          Text(label),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCrudSection() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: productController,
-            decoration: InputDecoration(
-              labelText: 'Enter Product Name',
-              border: OutlineInputBorder(),
+  Widget _iconWithLabel(IconData icon, String label) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [Colors.purple, Colors.pinkAccent],
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton(
-                onPressed: _addProduct,
-                child: Text('Add Product'),
-              ),
-              ElevatedButton(
-                onPressed: _updateProduct,
-                child: Text('Update Product'),
-              ),
-              ElevatedButton(
-                onPressed: _deleteProduct,
-                child: Text('Delete Product'),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: Offset(2, 4),
               ),
             ],
           ),
+          child: CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.transparent,
+            child: Icon(icon, size: 30, color: Colors.white),
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductManager() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnimatedSwitcher(
+            duration: Duration(milliseconds: 300),
+            child: Text(
+              editingIndex == null ? 'Add Product' : 'Edit Product',
+              key: ValueKey(editingIndex),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ),
+          SizedBox(height: 16),
+          _buildTextField('Product Name', productNameController, TextInputType.text),
+          SizedBox(height: 16),
+          _buildTextField('Product Price', productPriceController, TextInputType.number),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _animatedButton(
+                label: editingIndex == null ? 'Add' : 'Update',
+                onTap: _saveProduct,
+                colors: [Colors.green, Colors.teal],
+              ),
+              if (editingIndex != null)
+                _animatedButton(
+                  label: 'Cancel',
+                  onTap: _cancelEdit,
+                  colors: [Colors.redAccent, Colors.red],
+                ),
+            ],
+          ),
+          SizedBox(height: 32),
+          Text(
+            'Products',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return Dismissible(
+                  key: Key(product['name']),
+                  onDismissed: (direction) => _deleteProduct(index),
+                  background: Container(
+                    color: Colors.redAccent,
+                    alignment: Alignment.centerRight,
+                    padding: EdgeInsets.only(right: 16),
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 4,
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: ListTile(
+                      title: Text(
+                        product['name'],
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text('\$${product['price'].toStringAsFixed(2)}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () => _startEdit(index),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 
-  void _addProduct() {
-    if (productController.text.isNotEmpty) {
-      setState(() {
-        products.add({
-          'name': productController.text,
-          'imageUrl': 'https://example.com/newproduct.jpg',  // Add default image URL or let users upload images
-          'price': 49.99,  // Set default price or allow users to set
-        });
-        productController.clear();
-      });
-    }
+  Widget _buildTextField(String label, TextEditingController controller, TextInputType keyboardType) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+    );
   }
 
-  void _updateProduct() {
-    if (productController.text.isNotEmpty) {
-      setState(() {
-        products[0] = {
-          'name': productController.text,
-          'imageUrl': 'https://example.com/updatedproduct.jpg',
-          'price': 79.99,
-        };
-        productController.clear();
-      });
-    }
+  Widget _animatedButton({
+    required String label,
+    required VoidCallback onTap,
+    required List<Color> colors,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: colors),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 6,
+              offset: Offset(2, 4),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+      ),
+    );
   }
 
-  void _deleteProduct() {
+  void _saveProduct() {
+    final name = productNameController.text.trim();
+    final price = double.tryParse(productPriceController.text.trim());
+
+    if (name.isEmpty || price == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter valid product details.')),
+      );
+      return;
+    }
+
     setState(() {
-      products.removeAt(0);  // Deleting the first product (change this to implement specific product deletion)
+      if (editingIndex == null) {
+        products.add({'name': name, 'price': price});
+      } else {
+        products[editingIndex!] = {'name': name, 'price': price};
+        editingIndex = null;
+      }
+      productNameController.clear();
+      productPriceController.clear();
     });
   }
 
-  Widget _buildProductsSection(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Popular Products',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: products.map((product) {
-                return _productItem(context, product['name'], product['imageUrl'], product['price']);
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _startEdit(int? index) {
+    setState(() {
+      editingIndex = index;
+      if (index != null) {
+        productNameController.text = products[index]['name'];
+        productPriceController.text = products[index]['price'].toString();
+      } else {
+        productNameController.clear();
+        productPriceController.clear();
+      }
+    });
   }
 
-  Widget _productItem(BuildContext context, String name, String imageUrl, double price) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      width: 150,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(imageUrl, height: 150, fit: BoxFit.cover),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text('\$$price', style: TextStyle(color: Colors.green)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () {
-                          _showUpdateDialog(context, name);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          // Delete functionality
-                        },
-                      ),
-                    ],
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add to cart functionality
-                    },
-                    child: Text('Add to Cart'),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  void _cancelEdit() {
+    setState(() {
+      editingIndex = null;
+      productNameController.clear();
+      productPriceController.clear();
+    });
   }
 
-  void _showUpdateDialog(BuildContext context, String productName) {
-    TextEditingController _controller = TextEditingController(text: productName);
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Update Product'),
-          content: TextField(
-            controller: _controller,
-            decoration: InputDecoration(hintText: "Enter new product name"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Handle update logic here
-                Navigator.of(context).pop();
-              },
-              child: Text('Update'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildWishlistSection() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Wishlist',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _wishlistItem('Wishlist Item 1', 'https://example.com/wishlist1.jpg'),
-                _wishlistItem('Wishlist Item 2', 'https://example.com/wishlist2.jpg'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _wishlistItem(String name, String imageUrl) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      width: 150,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          children: [
-            Image.network(imageUrl, height: 150, fit: BoxFit.cover),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.remove_circle, color: Colors.red),
-                        onPressed: () {
-                          // Remove from wishlist
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.shopping_cart, color: Colors.blue),
-                        onPressed: () {
-                          // Add to cart
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAddressSection() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Delivery Address',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: ListTile(
-              title: Text('John Doe'),
-              subtitle: Text('123 Main St, City, Country'),
-              trailing: TextButton(
-                child: Text('Change'),
-                onPressed: () {
-                  // Navigate to address management
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCartSection() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Cart',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: ListTile(
-              title: Text('Cart Items: 3'),
-              trailing: ElevatedButton(
-                child: Text('View Cart'),
-                onPressed: () {
-                  // Navigate to cart screen
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOrderSummarySection() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Order Summary',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  _summaryRow('Subtotal', '\$299.97'),
-                  _summaryRow('Shipping', '\$10.00'),
-                  _summaryRow('Tax', '\$24.00'),
-                  Divider(),
-                  _summaryRow('Total', '\$333.97', isBold: true),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _summaryRow(String label, String value, {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return BottomNavigationBar(
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Wishlist'),
-        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-      ],
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            Navigator.pushNamed(context, '/home');
-            break;
-          case 1:
-            Navigator.pushNamed(context, '/wishlist');
-            break;
-          case 2:
-            Navigator.pushNamed(context, '/cart');
-            break;
-          case 3:
-            Navigator.pushNamed(context, '/profile');
-            break;
-        }
-      },
-    );
+  void _deleteProduct(int index) {
+    setState(() {
+      products.removeAt(index);
+    });
   }
 }

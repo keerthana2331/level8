@@ -1,11 +1,13 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_local_variable, use_key_in_widget_constructors, library_private_types_in_public_api
+
+
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'auth_provider.dart';
+import 'package:leveleight/apiservice.dart';
 
 import 'package:email_validator/email_validator.dart';
-import 'auth_provider.dart';
+
+import 'sign_model.dart'; // Your provider for authentication.
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -204,37 +206,78 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         ),
                       ),
                       SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            Provider.of<AuthProvider>(context, listen: false).signUp(
-                              _emailController.text,
-                              _passwordController.text,
-                            );
-                            Navigator.pushNamed(
-                              context,
-                              '/otp',
-                              arguments: _emailController.text,
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          iconColor: Colors.white,
-                          disabledIconColor: Color(0xFF6448FE),
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 5,
-                        ),
-                        child: Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                    ElevatedButton(
+onPressed: () async {
+  if (_formKey.currentState!.validate()) {
+    // Access values from the TextEditingControllers
+    String firstName = _firstNameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    String phone = _phoneController.text;
+
+    // Create a User object
+    User user = User(
+      fullname: firstName,
+      email: email,
+      password: password,
+      phone: phone,
+    );
+
+    try {
+      // Call the signupUser function and get the response
+      String? responseMessage = await signupUser(user);
+
+      // Show the API response in a Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(responseMessage!),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navigate to the OTP screen after successful signup
+      Navigator.pushNamed(
+        context,
+        '/otp',
+        arguments: email, // Pass email to the OTP screen
+      );
+    } catch (e) {
+      // Show error message if the signup fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Signup failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } else {
+    // Show error message if form validation fails
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Please correct the errors in the form.'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+},
+
+
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.symmetric(vertical: 16),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    elevation: 5,
+  ),
+  child: Text(
+    'Sign Up',
+    style: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
+
                     ],
                   ),
                 ),

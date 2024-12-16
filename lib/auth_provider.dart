@@ -20,14 +20,14 @@ class AuthProvider with ChangeNotifier {
   }
 
   void verifyOtp(String otp) {
-    if (otp == '123456') {
+    if (otp == '4040') {
       _isOtpVerified = true;
       notifyListeners();
     }
   }
 
   void resendOtp(String email) {
-    // Simulate resending OTP (e.g., calling an API endpoint)
+  
     print('Resending OTP to $email');
     notifyListeners();
   }
