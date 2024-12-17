@@ -1,58 +1,56 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:leveleight/login_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'login_model.dart';
 
 Future<String?> loginUser(Loguser loginUser) async {
   const String url = 'https://sampleapi.stackmod.info/api/v1/auth/login';
 
   try {
-    // Log the request details
     print('Initiating login request...');
-    print('Request URL: $url');
-    print('Request Headers: {"Content-Type": "application/json"}');
-    print('Request Body: ${jsonEncode(loginUser.toJson())}');
 
-    // Make the HTTP POST request
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(loginUser.toJson()), // Serialize LoginUser object to JSON
-    );
+    // Send POST request to the server
+    final response = await http
+        .post(
+          Uri.parse(url),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(loginUser.toJson()),
+        )
+        .timeout(Duration(seconds: 20), onTimeout: () {
+          throw 'The request timed out. Please try again.';
+        });
 
-    // Log response details
-    print('Response Status Code: ${response.statusCode}');
-    print('Response Body: ${response.body}');
+    print('Response status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
 
+    // Check the response status
     if (response.statusCode == 200 || response.statusCode == 201) {
-      // Parse successful login response
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-
-      // Check for the token in the response
+      
+      // If token exists, save it to SharedPreferences
       if (responseData.containsKey('token')) {
         final String token = responseData['token'];
-        print('Token received: $token');
 
-        // Save the token in SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', token);
-        print('Token saved to SharedPreferences');
 
-        return token; // Return the token if needed
+        print('Login successful. Token saved.');
+        return token;
+      } else {
+        return 'Login failed: Token not found in response.';
       }
-
-      return 'Login successful! No token found in the response.';
+    } else if (response.statusCode == 401) {
+      // Unauthorized: Invalid username or password
+      final Map<String, dynamic> errorResponse = jsonDecode(response.body);
+      String errorMessage = errorResponse['error'] ?? 'Invalid credentials.';
+      print('Error: $errorMessage');
+      return errorMessage;
     } else {
-      // Parse error response from the backend
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      String errorMessage = responseData['error'] ?? 'An unexpected error occurred.';
-      return 'Login failed: $errorMessage';
+      // Handle other errors
+      return 'Login failed: Unexpected error. Please try again.';
     }
   } catch (e) {
-    // Log any exceptions and rethrow a user-friendly message
     print('Error during login: $e');
-    throw 'An error occurred during login. Please try again.';
+    return 'An error occurred: $e';
   }
 }

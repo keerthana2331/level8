@@ -35,12 +35,12 @@ Future<String?> signupUser(User user) async {
         final String token = responseData['token'];
         print('Token received: $token');
 
-        // Save the token in SharedPreferences
+       
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', token);
         print('Token saved to SharedPreferences');
 
-        return token; // Return the token if needed
+        return token; 
       }
 
       return 'Signup successful! No token found in the response.';
@@ -55,8 +55,4 @@ Future<String?> signupUser(User user) async {
     print('Error during signup: $e');
     throw 'An error occurred during signup. Please try again.';
   }
-  
-
-
-  
 }

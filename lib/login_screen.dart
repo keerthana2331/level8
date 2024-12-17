@@ -1,31 +1,15 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
+import 'package:leveleight/login_apiservice.dart';
 import 'package:provider/provider.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'login_model.dart';
 import 'auth_provider.dart';
 
-class Loguser {
-  final String email;
-  final String password;
 
-  Loguser({required this.email, required this.password});
-
-  Map<String, dynamic> toJson() => {
-        'email': email,
-        'password': password,
-      };
-
-  static Loguser fromJson(Map<String, dynamic> json) {
-    return Loguser(
-      email: json['email'],
-      password: json['password'],
-    );
-  }
-
-  @override
-  String toString() => 'Loguser(email: $email, password: ****)';
-}
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -268,27 +252,33 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 ),
                               ),
                               SizedBox(height: 20),
-                          ElevatedButton(
+                        ElevatedButton(
   onPressed: () async {
     if (_formKey.currentState!.validate()) {
-      // Create an instance of Loguser with the entered email and password
       final loguser = Loguser(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
-      // Print the Loguser instance to confirm the values
-      print('Loguser instance created: $loguser');
+      // Attempt login
+      final result = await loginUser(loguser);
 
-      // Proceed with the existing login handling
-      await _handleLogin(context, authProvider);
+      if (result != null && !result.contains('Login failed')) {
+        // Save token and navigate to Home Page on successful login
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('authToken', result);
+
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // Show error message using Snackbar or AlertDialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result ?? 'An error occurred')),
+        );
+      }
     }
   },
   style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.symmetric(
-      horizontal: 50,
-      vertical: 15,
-    ),
+    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(30),
     ),
@@ -300,7 +290,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       fontWeight: FontWeight.bold,
     ),
   ),
-),
+)
+
+
                      ],
                           ),
                         ),
@@ -338,4 +330,4 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
-}
+} 
