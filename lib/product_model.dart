@@ -13,7 +13,6 @@ class Product {
     required this.imageUrl,
   });
 
-  // Convert to and from JSON for easy serialization
   factory Product.fromJson(Map<String, dynamic> json) => Product(
         id: json['id'],
         name: json['name'],

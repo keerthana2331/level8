@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, unused_local_variable, use_key_in_widget_constructors, library_private_types_in_public_api
+// ignore_for_file: prefer_const_constructors, unused_local_variable, use_key_in_widget_constructors, library_private_types_in_public_api, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:leveleight/signup_api.dart';
