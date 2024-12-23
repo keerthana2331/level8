@@ -1,124 +1,40 @@
-// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
+import 'dart:math' as math;
 
 class FirstScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF0A0A0A),
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF6A11CB).withOpacity(0.9),
-                  Color(0xFF2575FC).withOpacity(0.9),
-                ],
-              ),
-            ),
-            child: Center(
-              child: Container(
-                width: 400,
-                height: 600,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 30,
-                      spreadRadius: 5,
-                    )
-                  ],
-                ),
-              ),
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: Listenable.merge([
+                AlwaysStoppedAnimation(0),
+              ]),
+              builder: (context, child) {
+                return CustomPaint(
+                  size: MediaQuery.of(context).size,
+                  painter: OrbsPainter(DateTime.now().millisecondsSinceEpoch % 10000 / 10000),
+                );
+              },
             ),
           ),
-
-          // Content
           SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // App Logo or Title
-                    Text(
-                      'ShoppingCart',
-                      style: GoogleFonts.orbitron(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.5,
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(duration: Duration(milliseconds: 800))
-                        .slideY(begin: -0.5, end: 0),
-
-                    SizedBox(height: 40),
-
-                    // Signup Button
-                    _buildGlassButton(
-                      context,
-                      text: 'Sign Up',
-                      icon: IconlyBold.add_user,
-                      onPressed: () {
-                        print('Sign-Up button clicked'); // Debugging message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Navigating to Sign-Up page...'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        Navigator.pushNamed(context, '/signup');
-                      },
-                      colors: [
-                        Color(0xFFFF6B6B),
-                        Color(0xFFFFA726),
-                      ],
-                    )
-                        .animate()
-                        .fadeIn(duration: Duration(milliseconds: 600))
-                        .scaleXY(
-                            begin: 0.8,
-                            end: 1,
-                            duration: Duration(milliseconds: 400)),
-
-                    SizedBox(height: 20),
-
-                    // Login Button
-                    _buildGlassButton(
-                      context,
-                      text: 'Log In',
-                      icon: IconlyBold.login,
-                      onPressed: () => Navigator.pushNamed(context, '/login'),
-                      colors: [
-                        Color(0xFF4CAF50),
-                        Color(0xFF2196F3),
-                      ],
-                    )
-                        .animate()
-                        .fadeIn(
-                            duration: Duration(milliseconds: 600),
-                            delay: Duration(milliseconds: 200))
-                        .scaleXY(
-                            begin: 0.8,
-                            end: 1,
-                            duration: Duration(milliseconds: 400),
-                            delay: Duration(milliseconds: 200)),
-                  ],
-                ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 25),
+              child: Column(
+                children: [
+                  SizedBox(height: 40),
+                  Expanded(
+                    child: _buildMainContent(context),
+                  ),
+                  SizedBox(height: 30),
+                ],
               ),
             ),
           ),
@@ -127,57 +43,195 @@ class FirstScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGlassButton(
-    BuildContext context, {
-    required String text,
-    required IconData icon,
-    required VoidCallback onPressed,
-    required List<Color> colors,
-  }) {
-    return Container(
-      width: 300,
-      height: 65,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(35),
-        gradient: LinearGradient(
-          colors: colors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildMainContent(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildLogo(),
+        SizedBox(height: 50),
+        _buildAuthButtons(context),
+      ],
+    );
+  }
+
+  Widget _buildLogo() {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(25),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 2,
+            ),
+          ),
+          child: Icon(
+            IconlyBold.bag_2,
+            size: 50,
+            color: Colors.white,
+          ),
         ),
+        SizedBox(height: 20),
+        Text(
+          'LUXEMART',
+          style: GoogleFonts.syncopate(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 8,
+          ),
+        ).animate()
+          .fadeIn()
+          .slideY(begin: 0.3)
+          .then()
+          .shimmer(delay: 400.ms),
+      ],
+    );
+  }
+
+  Widget _buildAuthButtons(BuildContext context) {
+    return Column(
+      children: [
+        _buildPrimaryButton(
+          'Create Account',
+          IconlyBold.add_user,
+          [Color(0xFF8A2BE2), Color(0xFF4B0082)],
+          () => Navigator.pushNamed(context, '/signup'),
+        ),
+        SizedBox(height: 15),
+        _buildSecondaryButton(
+          'Sign In',
+          IconlyBold.login,
+          () => Navigator.pushNamed(context, '/login'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrimaryButton(String text, IconData icon, List<Color> colors, VoidCallback onPressed) {
+    return Container(
+      width: double.infinity,
+      height: 60,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: colors),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            offset: Offset(0, 8),
-          )
+            color: colors[0].withOpacity(0.3),
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
         ],
       ),
-      child: ElevatedButton(
+      child: MaterialButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(35),
-          ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 24),
-            SizedBox(width: 15),
+            Icon(icon, color: Colors.white),
+            SizedBox(width: 10),
             Text(
               text,
-              style: GoogleFonts.roboto(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
-                letterSpacing: 1.2,
               ),
             ),
           ],
         ),
       ),
+    ).animate()
+      .fadeIn()
+      .slideX(begin: -0.2, end: 0)
+      .then()
+      .shimmer(delay: 2.seconds);
+  }
+
+  Widget _buildSecondaryButton(String text, IconData icon, VoidCallback onPressed) {
+    return Container(
+      width: double.infinity,
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+        ),
+      ),
+      child: MaterialButton(
+        onPressed: onPressed,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              text,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).animate()
+      .fadeIn(delay: 200.ms)
+      .slideX(begin: 0.2, end: 0);
+  }
+}
+
+class OrbsPainter extends CustomPainter {
+  final double animation;
+
+  OrbsPainter(this.animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    void drawOrb(double x, double y, Color color, double radius) {
+      final gradient = RadialGradient(
+        colors: [
+          color.withOpacity(0.3),
+          color.withOpacity(0),
+        ],
+      );
+
+      final rect = Rect.fromCircle(
+        center: Offset(x, y),
+        radius: radius,
+      );
+
+      paint.shader = gradient.createShader(rect);
+      canvas.drawCircle(Offset(x, y), radius, paint);
+    }
+
+    drawOrb(
+      size.width * (0.5 + math.cos(animation * 2 * math.pi) * 0.2),
+      size.height * (0.3 + math.sin(animation * 2 * math.pi) * 0.1),
+      Colors.purple,
+      size.width * 0.4,
+    );
+
+    drawOrb(
+      size.width * (0.5 + math.cos((animation + 0.4) * 2 * math.pi) * 0.2),
+      size.height * (0.6 + math.sin((animation + 0.4) * 2 * math.pi) * 0.1),
+      Colors.blue,
+      size.width * 0.3,
     );
   }
+
+  @override
+  bool shouldRepaint(OrbsPainter oldDelegate) => true;
 }
