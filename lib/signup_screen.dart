@@ -1,7 +1,5 @@
 // ignore_for_file: prefer_const_constructors, unused_local_variable, use_key_in_widget_constructors, library_private_types_in_public_api
 
-
-
 import 'package:flutter/material.dart';
 import 'package:leveleight/signup_api.dart';
 
@@ -14,7 +12,8 @@ class SignupScreen extends StatefulWidget {
   _SignupScreenState createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderStateMixin {
+class _SignupScreenState extends State<SignupScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -206,78 +205,77 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         ),
                       ),
                       SizedBox(height: 24),
-                    ElevatedButton(
-onPressed: () async {
-  if (_formKey.currentState!.validate()) {
-    // Access values from the TextEditingControllers
-    String firstName = _firstNameController.text;
-    String email = _emailController.text;
-    String password = _passwordController.text;
-    String phone = _phoneController.text;
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            // Access values from the TextEditingControllers
+                            String firstName = _firstNameController.text;
+                            String email = _emailController.text;
+                            String password = _passwordController.text;
+                            String phone = _phoneController.text;
 
-    // Create a User object
-    User user = User(
-      fullname: firstName,
-      email: email,
-      password: password,
-      phone: phone,
-    );
+                            // Create a User object
+                            User user = User(
+                              fullname: firstName,
+                              email: email,
+                              password: password,
+                              phone: phone,
+                            );
 
-    try {
-      // Call the signupUser function and get the response
-      String? responseMessage = await signupUser(user);
+                            try {
+                              // Call the signupUser function and get the response
+                              String? responseMessage = await signupUser(user);
 
-      // Show the API response in a Snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(responseMessage!),
-          backgroundColor: Colors.green,
-        ),
-      );
+                              // Show the API response in a Snackbar
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(responseMessage!),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
 
-      // Navigate to the OTP screen after successful signup
-      Navigator.pushNamed(
-        context,
-        '/otp',
-        arguments: email, // Pass email to the OTP screen
-      );
-    } catch (e) {
-      // Show error message if the signup fails
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Signup failed: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  } else {
-    // Show error message if form validation fails
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Please correct the errors in the form.'),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-},
-
-
-  style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.symmetric(vertical: 16),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-    elevation: 5,
-  ),
-  child: Text(
-    'Sign Up',
-    style: TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-),
-
+                              // Navigate to the OTP screen after successful signup
+                              Navigator.pushNamed(
+                                context,
+                                '/otp',
+                                arguments:
+                                    email, // Pass email to the OTP screen
+                              );
+                            } catch (e) {
+                              // Show error message if the signup fails
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Signup failed: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          } else {
+                            // Show error message if form validation fails
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Please correct the errors in the form.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 5,
+                        ),
+                        child: Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

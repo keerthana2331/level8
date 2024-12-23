@@ -1,3 +1,5 @@
+// login_model.dart
+
 class Loguser {
   final String email;
   final String password;
@@ -7,7 +9,7 @@ class Loguser {
     required this.password,
   });
 
-  // Method to convert User object to JSON (Serialization)
+  // Convert Loguser object to JSON (Serialization)
   Map<String, dynamic> toJson() {
     return {
       'email': email,
@@ -15,7 +17,7 @@ class Loguser {
     };
   }
 
-  // Factory constructor to create User object from JSON (Deserialization)
+  // Create Loguser object from JSON (Deserialization)
   factory Loguser.fromJson(Map<String, dynamic> json) {
     return Loguser(
       email: json['email'],
@@ -25,6 +27,6 @@ class Loguser {
 
   @override
   String toString() {
-    return 'Loguser( email: $email, password: $password)';
+    return 'Loguser(email: $email, password: $password)';
   }
 }

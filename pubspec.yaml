@@ -43,6 +43,7 @@ dependencies:
   iconly: ^1.0.1
   email_validator: ^3.0.0
   http: ^1.2.2
+  animate_do: ^3.3.4
 
 dev_dependencies:
   flutter_test:

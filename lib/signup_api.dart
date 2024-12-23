@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:leveleight/sign_model.dart';
+import 'package:leveleight/sign_model.dart';  // Assuming you have a User model in this file
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<String?> signupUser(User user) async {
@@ -20,7 +20,9 @@ Future<String?> signupUser(User user) async {
         'Content-Type': 'application/json',
       },
       body: jsonEncode(user.toJson()), // Serialize User object to JSON
-    );
+    ).timeout(Duration(seconds: 20), onTimeout: () {
+      throw 'The request timed out. Please try again.';
+    });
 
     // Log response details
     print('Response Status Code: ${response.statusCode}');
@@ -35,7 +37,7 @@ Future<String?> signupUser(User user) async {
         final String token = responseData['token'];
         print('Token received: $token');
 
-       
+        // Save the token in SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', token);
         print('Token saved to SharedPreferences');
