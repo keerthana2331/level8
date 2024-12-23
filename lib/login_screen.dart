@@ -6,13 +6,13 @@ import 'package:animate_do/animate_do.dart';
 import 'login_model.dart';
 
 class LoginScreen extends StatelessWidget {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   LoginScreen({Key? key}) : super(key: key);
 
-  String? _validateEmail(String? value) {
+  String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
@@ -22,7 +22,7 @@ class LoginScreen extends StatelessWidget {
     return null;
   }
 
-  String? _validatePassword(String? value) {
+  String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your password';
     }
@@ -32,8 +32,8 @@ class LoginScreen extends StatelessWidget {
     return null;
   }
 
-  Future<void> _handleLogin(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
+  Future<void> handleLogin(BuildContext context) async {
+    if (formKey.currentState!.validate()) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -41,13 +41,13 @@ class LoginScreen extends StatelessWidget {
       );
 
       final logUser = Loguser(
-        email: _emailController.text,
-        password: _passwordController.text,
+        email: emailController.text,
+        password: passwordController.text,
       );
 
       try {
         final token = await loginUser(logUser);
-        Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+        Navigator.of(context, rootNavigator: true).pop();
 
         if (token != null) {
           final prefs = await SharedPreferences.getInstance();
@@ -64,7 +64,7 @@ class LoginScreen extends StatelessWidget {
           );
         }
       } catch (e) {
-        Navigator.of(context, rootNavigator: true).pop(); // Ensure dialog closes
+        Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
@@ -79,6 +79,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -89,11 +90,11 @@ class LoginScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(24.0),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.grey.shade900,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withOpacity(0.5),
                         spreadRadius: 5,
                         blurRadius: 15,
                         offset: const Offset(0, 3),
@@ -101,14 +102,14 @@ class LoginScreen extends StatelessWidget {
                     ],
                   ),
                   child: Form(
-                    key: _formKey,
+                    key: formKey,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
                           Icons.lock_outline,
                           size: 50,
-                          color: Color(0xFF673AB7),
+                          color: Colors.purpleAccent,
                         ),
                         const SizedBox(height: 20),
                         const Text(
@@ -116,54 +117,74 @@ class LoginScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF673AB7),
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 30),
                         TextFormField(
-                          controller: _emailController,
+                          controller: emailController,
+                          style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF673AB7)),
-                            border: OutlineInputBorder(
+                            labelStyle: TextStyle(color: Colors.grey.shade500),
+                            prefixIcon: const Icon(Icons.email_outlined,
+                                color: Colors.purpleAccent),
+                            enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  BorderSide(color: Colors.grey.shade700),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.purpleAccent),
                             ),
                           ),
                           keyboardType: TextInputType.emailAddress,
-                          validator: _validateEmail,
+                          validator: validateEmail,
                         ),
                         const SizedBox(height: 20),
                         TextFormField(
-                          controller: _passwordController,
+                          controller: passwordController,
+                          style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             labelText: 'Password',
-                            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF673AB7)),
-                            border: OutlineInputBorder(
+                            labelStyle: TextStyle(color: Colors.grey.shade500),
+                            prefixIcon: const Icon(Icons.lock_outline,
+                                color: Colors.purpleAccent),
+                            enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  BorderSide(color: Colors.grey.shade700),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.purpleAccent),
                             ),
                           ),
                           obscureText: true,
-                          validator: _validatePassword,
+                          validator: validatePassword,
                         ),
                         const SizedBox(height: 30),
                         SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: () => _handleLogin(context),
+                            onPressed: () => handleLogin(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF673AB7),
+                              backgroundColor: Colors.purpleAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              elevation: 3,
+                              elevation: 5,
                             ),
                             child: const Text(
                               'Login',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: Colors.black,
                               ),
                             ),
                           ),
@@ -174,7 +195,7 @@ class LoginScreen extends StatelessWidget {
                           child: const Text(
                             'Don’t have an account? Sign Up',
                             style: TextStyle(
-                              color: Color(0xFF673AB7),
+                              color: Colors.purpleAccent,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

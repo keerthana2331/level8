@@ -1,5 +1,3 @@
-
-// Product Model
 class Product {
   String id;
   String name;

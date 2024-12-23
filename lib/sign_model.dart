@@ -1,4 +1,3 @@
-
 class User {
   final String fullname;
   final String email;
@@ -12,7 +11,6 @@ class User {
     required this.phone,
   });
 
-  // Method to convert User object to JSON (Serialization)
   Map<String, dynamic> toJson() {
     return {
       'fullname': fullname,
@@ -22,7 +20,6 @@ class User {
     };
   }
 
-  // Factory constructor to create User object from JSON (Deserialization)
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       fullname: json['fullname'],

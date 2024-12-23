@@ -19,7 +19,8 @@ class FirstScreen extends StatelessWidget {
               builder: (context, child) {
                 return CustomPaint(
                   size: MediaQuery.of(context).size,
-                  painter: OrbsPainter(DateTime.now().millisecondsSinceEpoch % 10000 / 10000),
+                  painter: OrbsPainter(
+                      DateTime.now().millisecondsSinceEpoch % 10000 / 10000),
                 );
               },
             ),
@@ -31,7 +32,7 @@ class FirstScreen extends StatelessWidget {
                 children: [
                   SizedBox(height: 40),
                   Expanded(
-                    child: _buildMainContent(context),
+                    child: buildMainContent(context),
                   ),
                   SizedBox(height: 30),
                 ],
@@ -43,18 +44,18 @@ class FirstScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context) {
+  Widget buildMainContent(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildLogo(),
+        buildLogo(),
         SizedBox(height: 50),
-        _buildAuthButtons(context),
+        buildAuthButtons(context),
       ],
     );
   }
 
-  Widget _buildLogo() {
+  Widget buildLogo() {
     return Column(
       children: [
         Container(
@@ -75,34 +76,30 @@ class FirstScreen extends StatelessWidget {
         ),
         SizedBox(height: 20),
         Text(
-          'LUXEMART',
+          'SHOPPING CART',
           style: GoogleFonts.syncopate(
-            fontSize: 32,
+            fontSize: 23,
             fontWeight: FontWeight.bold,
             color: Colors.white,
             letterSpacing: 8,
           ),
-        ).animate()
-          .fadeIn()
-          .slideY(begin: 0.3)
-          .then()
-          .shimmer(delay: 400.ms),
+        ).animate().fadeIn().slideY(begin: 0.3).then().shimmer(delay: 400.ms),
       ],
     );
   }
 
-  Widget _buildAuthButtons(BuildContext context) {
+  Widget buildAuthButtons(BuildContext context) {
     return Column(
       children: [
-        _buildPrimaryButton(
+        buildPrimaryButton(
           'Create Account',
           IconlyBold.add_user,
           [Color(0xFF8A2BE2), Color(0xFF4B0082)],
           () => Navigator.pushNamed(context, '/signup'),
         ),
         SizedBox(height: 15),
-        _buildSecondaryButton(
-          'Sign In',
+        buildSecondaryButton(
+          'LOGIN',
           IconlyBold.login,
           () => Navigator.pushNamed(context, '/login'),
         ),
@@ -110,7 +107,8 @@ class FirstScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPrimaryButton(String text, IconData icon, List<Color> colors, VoidCallback onPressed) {
+  Widget buildPrimaryButton(
+      String text, IconData icon, List<Color> colors, VoidCallback onPressed) {
     return Container(
       width: double.infinity,
       height: 60,
@@ -146,14 +144,16 @@ class FirstScreen extends StatelessWidget {
           ],
         ),
       ),
-    ).animate()
-      .fadeIn()
-      .slideX(begin: -0.2, end: 0)
-      .then()
-      .shimmer(delay: 2.seconds);
+    )
+        .animate()
+        .fadeIn()
+        .slideX(begin: -0.2, end: 0)
+        .then()
+        .shimmer(delay: 2.seconds);
   }
 
-  Widget _buildSecondaryButton(String text, IconData icon, VoidCallback onPressed) {
+  Widget buildSecondaryButton(
+      String text, IconData icon, VoidCallback onPressed) {
     return Container(
       width: double.infinity,
       height: 60,
@@ -185,9 +185,7 @@ class FirstScreen extends StatelessWidget {
           ],
         ),
       ),
-    ).animate()
-      .fadeIn(delay: 200.ms)
-      .slideX(begin: 0.2, end: 0);
+    ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.2, end: 0);
   }
 }
 

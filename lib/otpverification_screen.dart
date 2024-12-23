@@ -3,16 +3,16 @@ import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 
 class OTPScreen extends StatelessWidget {
-  final List<TextEditingController> _otpControllers = List.generate(
+  final List<TextEditingController> otpControllers = List.generate(
     4,
     (index) => TextEditingController(),
   );
 
   String getOtp() {
-    return _otpControllers.map((controller) => controller.text).join();
+    return otpControllers.map((controller) => controller.text).join();
   }
 
-  void _verifyOtp(BuildContext context, String email) {
+  void verifyOtp(BuildContext context, String email) {
     final otp = getOtp();
     if (otp.length != 4) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -39,7 +39,7 @@ class OTPScreen extends StatelessWidget {
     }
   }
 
-  void _resendOtp(BuildContext context, String email) {
+  void resendOtp(BuildContext context, String email) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     authProvider.resendOtp(email);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -148,16 +148,18 @@ class OTPScreen extends StatelessWidget {
                             (index) => SizedBox(
                               width: 55,
                               child: TextFormField(
-                                controller: _otpControllers[index],
+                                controller: otpControllers[index],
                                 decoration: InputDecoration(
                                   counterText: "",
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Color(0xFF1E3C72)),
+                                    borderSide:
+                                        BorderSide(color: Color(0xFF1E3C72)),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Color(0xFF1E3C72), width: 2),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF1E3C72), width: 2),
                                   ),
                                 ),
                                 keyboardType: TextInputType.number,
@@ -174,10 +176,11 @@ class OTPScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 30),
                         ElevatedButton(
-                          onPressed: () => _verifyOtp(context, email),
+                          onPressed: () => verifyOtp(context, email),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF1E3C72),
-                            padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 50, vertical: 15),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
@@ -189,13 +192,17 @@ class OTPScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         TextButton(
-                          onPressed: canResendOtp ? () => _resendOtp(context, email) : null,
+                          onPressed: canResendOtp
+                              ? () => resendOtp(context, email)
+                              : null,
                           child: Text(
                             canResendOtp
                                 ? 'Resend OTP'
                                 : 'Resend OTP in $countdown seconds',
                             style: TextStyle(
-                              color: canResendOtp ? Color(0xFF1E3C72) : Colors.grey,
+                              color: canResendOtp
+                                  ? Color(0xFF1E3C72)
+                                  : Colors.grey,
                             ),
                           ),
                         ),

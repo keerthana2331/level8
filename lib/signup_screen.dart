@@ -3,64 +3,47 @@
 import 'package:flutter/material.dart';
 import 'package:leveleight/signup_api.dart';
 import 'package:email_validator/email_validator.dart';
-import 'sign_model.dart'; // Your provider for authentication.
+import 'sign_model.dart';
 
 class SignupScreen extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
-  String? _validateFirstName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your first name';
-    }
-    if (value.length < 2) {
-      return 'Name must be at least 2 characters';
-    }
-    return null;
-  }
+  String? validateFirstName(String? value) => value == null || value.isEmpty
+      ? 'Please enter your first name'
+      : value.length < 2
+          ? 'Name must be at least 2 characters'
+          : null;
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    }
-    if (!EmailValidator.validate(value)) {
-      return 'Please enter a valid email';
-    }
-    return null;
-  }
+  String? validateEmail(String? value) => value == null || value.isEmpty
+      ? 'Please enter your email'
+      : !EmailValidator.validate(value)
+          ? 'Please enter a valid email'
+          : null;
 
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your password';
-    }
-    if (value.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-    if (!value.contains(RegExp(r'[A-Z]'))) {
+  String? validatePassword(String? value) {
+    if (value == null || value.isEmpty) return 'Please enter your password';
+    if (value.length < 8) return 'Password must be at least 8 characters';
+    if (!value.contains(RegExp(r'[A-Z]')))
       return 'Password must contain at least one uppercase letter';
-    }
-    if (!value.contains(RegExp(r'[0-9]'))) {
+    if (!value.contains(RegExp(r'[0-9]')))
       return 'Password must contain at least one number';
-    }
     return null;
   }
 
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your phone number';
-    }
-    if (!RegExp(r'^\+?[\d\s-]{10,}$').hasMatch(value)) {
-      return 'Please enter a valid phone number';
-    }
-    return null;
-  }
+  String? validatePhone(String? value) => value == null || value.isEmpty
+      ? 'Please enter your phone number'
+      : !RegExp(r'^\+?[\d\s-]{10,}$').hasMatch(value)
+          ? 'Please enter a valid phone number'
+          : null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF1A1A1A),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
@@ -74,9 +57,7 @@ class SignupScreen extends StatelessWidget {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/');
-          },
+          onPressed: () => Navigator.pushReplacementNamed(context, '/'),
         ),
       ),
       body: Container(
@@ -85,26 +66,26 @@ class SignupScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF6448FE),
-              Color(0xFF5FC6FF),
+              Color(0xFF2E1F6D),
+              Color(0xFF1A1A1A),
             ],
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.all(24.0),
               child: Form(
-                key: _formKey,
+                key: formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: 20),
-                    _buildInputForm(),
+                    buildInputForm(),
                     SizedBox(height: 24),
-                    _buildSignUpButton(context),
+                    buildSignUpButton(context),
                     SizedBox(height: 12),
-                    _buildBackToHomeButton(context),
+                    buildBackToHomeButton(context),
                   ],
                 ),
               ),
@@ -115,15 +96,15 @@ class SignupScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInputForm() {
+  Widget buildInputForm() {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: Colors.black26,
             blurRadius: 15,
             offset: Offset(0, 5),
           ),
@@ -132,124 +113,92 @@ class SignupScreen extends StatelessWidget {
       child: Column(
         children: [
           TextFormField(
-            controller: _firstNameController,
-            decoration: InputDecoration(
-              labelText: 'First Name',
-              prefixIcon: Icon(Icons.person_outline),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            validator: _validateFirstName,
+            controller: firstNameController,
+            style: TextStyle(color: Colors.white),
+            decoration:
+                buildInputDecoration('First Name', Icons.person_outline),
+            validator: validateFirstName,
           ),
           SizedBox(height: 16),
           TextFormField(
-            controller: _emailController,
-            decoration: InputDecoration(
-              labelText: 'Email',
-              prefixIcon: Icon(Icons.email_outlined),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            validator: _validateEmail,
+            controller: emailController,
+            style: TextStyle(color: Colors.white),
+            decoration: buildInputDecoration('Email', Icons.email_outlined),
+            validator: validateEmail,
           ),
           SizedBox(height: 16),
           TextFormField(
-            controller: _passwordController,
+            controller: passwordController,
+            style: TextStyle(color: Colors.white),
             obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              prefixIcon: Icon(Icons.lock_outline),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            validator: _validatePassword,
+            decoration: buildInputDecoration('Password', Icons.lock_outline),
+            validator: validatePassword,
           ),
           SizedBox(height: 16),
           TextFormField(
-            controller: _phoneController,
+            controller: phoneController,
+            style: TextStyle(color: Colors.white),
             keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              labelText: 'Phone Number',
-              prefixIcon: Icon(Icons.phone_outlined),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            validator: _validatePhone,
+            decoration:
+                buildInputDecoration('Phone Number', Icons.phone_outlined),
+            validator: validatePhone,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSignUpButton(BuildContext context) {
+  InputDecoration buildInputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Colors.grey[400]),
+      prefixIcon: Icon(icon, color: Colors.grey[400]),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[700]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[700]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Color(0xFF6448FE)),
+      ),
+      filled: true,
+      fillColor: Color(0xFF363636),
+    );
+  }
+
+  Widget buildSignUpButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
-        if (_formKey.currentState!.validate()) {
-          String firstName = _firstNameController.text;
-          String email = _emailController.text;
-          String password = _passwordController.text;
-          String phone = _phoneController.text;
-
-          User user = User(
-            fullname: firstName,
-            email: email,
-            password: password,
-            phone: phone,
-          );
-
+        if (formKey.currentState!.validate()) {
           try {
-            String? responseMessage = await signupUser(user);
+            String? responseMessage = await signupUser(User(
+              fullname: firstNameController.text,
+              email: emailController.text,
+              password: passwordController.text,
+              phone: phoneController.text,
+            ));
 
             if (responseMessage == "Number already exists") {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Phone number already exists. Please use a different number."),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              showErrorSnackBar(context,
+                  "Phone number already exists. Please use a different number.");
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(responseMessage!),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.pushNamed(
-                context,
-                '/otp',
-                arguments: email,
-              );
+              showSuccessSnackBar(context, responseMessage!);
+              Navigator.pushNamed(context, '/otp',
+                  arguments: emailController.text);
             }
           } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Signup failed: $e'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            showErrorSnackBar(context, 'Signup failed: $e');
           }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Please correct the errors in the form.'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showErrorSnackBar(context, 'Please correct the errors in the form.');
         }
       },
       style: ElevatedButton.styleFrom(
+        backgroundColor: Color(0xFF6448FE),
         padding: EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -261,19 +210,36 @@ class SignupScreen extends StatelessWidget {
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
       ),
     );
   }
 
-  Widget _buildBackToHomeButton(BuildContext context) {
+  Widget buildBackToHomeButton(BuildContext context) {
     return TextButton(
-      onPressed: () {
-        Navigator.pushReplacementNamed(context, '/');
-      },
+      onPressed: () => Navigator.pushReplacementNamed(context, '/'),
       child: Text(
         'Back to Home',
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.grey[400]),
+      ),
+    );
+  }
+
+  void showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red[700],
+      ),
+    );
+  }
+
+  void showSuccessSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green[700],
       ),
     );
   }
