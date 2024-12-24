@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +58,7 @@ class OTPScreen extends StatelessWidget {
     final email = ModalRoute.of(context)!.settings.arguments as String;
     final authProvider = Provider.of<AuthProvider>(context);
 
-    final isOtpVerified = authProvider.isOtpVerified ?? false;
+    final isOtpVerified = authProvider.isOtpVerified;
     final canResendOtp = authProvider.canResendOtp ?? true;
     final countdown = authProvider.countdown ?? 0;
 
