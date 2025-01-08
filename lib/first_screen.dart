@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -112,14 +114,6 @@ class ShoppingHomePage extends StatelessWidget {
             color: Color(0xFF2D3436),
           ),
         ),
-        // const Text(
-        //   'Discover the extraordinary',
-        //   style: TextStyle(
-        //     fontSize: 16,
-        //     color: Color(0xFF636E72),
-        //     letterSpacing: 2,
-        //   ),
-        // ),
       ],
     );
   }

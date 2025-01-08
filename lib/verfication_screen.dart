@@ -1,4 +1,4 @@
-// ignore_for_file: use_super_parameters
+// ignore_for_file: use_super_parameters, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
@@ -230,7 +230,7 @@ class VerificationPage extends StatelessWidget {
       final email = emailController.text.trim();
       isLoading.value = true;
       try {
-        bool otpSent = await VerificationService.verifyUser(email);
+        bool otpSent = await authProvider.verifyUser(email);
         if (otpSent) {
           Navigator.pushNamed(
             context,

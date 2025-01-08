@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class VerificationService {
+class authProvider{
   static Future<bool> verifyUser(String? email) async {
     if (email == null || email.isEmpty) {
       print('Invalid email input');
@@ -145,7 +145,7 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> verifyOtp(String otp, String email) async {
     try {
-      final bool userExists = await VerificationService.verifyUser(email);
+      final bool userExists = await authProvider.verifyUser(email);
       final String _verifyOtpUrl =
           'https://sampleapi.stackmod.info/api/v1/auth/otp';
       if (!userExists) {
