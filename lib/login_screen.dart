@@ -35,7 +35,7 @@ class LoginScreen extends StatelessWidget {
     return null;
   }
 
-  void _showSnackBar(BuildContext context, String message,
+  void showSnackBar(BuildContext context, String message,
       {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -67,10 +67,10 @@ class LoginScreen extends StatelessWidget {
           await prefs.setString('authToken', token);
           Navigator.pushReplacementNamed(context, '/home');
         } else {
-          _showSnackBar(context, 'Invalid email or password', isError: true);
+          showSnackBar(context, 'Invalid email or password', isError: true);
         }
       } catch (e) {
-        _showSnackBar(context, 'Error: $e', isError: true);
+        showSnackBar(context, 'Error: $e', isError: true);
       } finally {
         isLoading.value = false;
       }
@@ -105,7 +105,6 @@ class LoginScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 40),
-                    // Decorative Element
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -140,7 +139,6 @@ class LoginScreen extends StatelessWidget {
                           ),
                     ),
                     const SizedBox(height: 40),
-                    // Email Field with Card
                     Card(
                       elevation: 0,
                       color: Colors.grey.shade50,
@@ -163,7 +161,6 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Password Field with Card
                     Card(
                       elevation: 0,
                       color: Colors.grey.shade50,
@@ -201,7 +198,6 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    // Forgot Password
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -210,7 +206,6 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    // Login Button
                     ValueListenableBuilder<bool>(
                       valueListenable: isLoading,
                       builder: (context, loading, _) {
@@ -250,7 +245,6 @@ class LoginScreen extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 24),
-                    // Sign Up Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

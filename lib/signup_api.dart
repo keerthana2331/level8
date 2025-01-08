@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<String?> signupUser(User user) async {
   const String url = 'https://sampleapi.stackmod.info/api/v1/auth/signup';
   try {
-    // Debugging: Print the request details
     print('Initiating signup request...');
     print('Request URL: $url');
     print('Request Headers: {"Content-Type": "application/json"}');
@@ -25,17 +24,17 @@ Future<String?> signupUser(User user) async {
         throw 'The request timed out. Please try again.';
       },
     );
-    // Debugging: Print the response details
+
     print('Response Status Code: ${response.statusCode}');
     print('Response Body: ${response.body}');
     if (response.statusCode == 200 || response.statusCode == 201) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (responseData.containsKey('token')) {
         final String token = responseData['token'];
-        // Save the token to SharedPreferences
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', token);
-        // Debugging: Confirm token storage
+
         print('Token received and saved to SharedPreferences');
         return token;
       }
@@ -47,7 +46,6 @@ Future<String?> signupUser(User user) async {
       return 'Signup failed: $errorMessage';
     }
   } catch (e) {
-    // Catching any exceptions and handling them properly
     print('Error during signup: $e');
     return 'An error occurred during signup. Please try again.';
   }

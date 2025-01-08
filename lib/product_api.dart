@@ -4,9 +4,8 @@ import 'package:leveleight/product_model.dart';
 
 class ProductApiService {
   static const String baseUrl =
-      'https://crudcrud.com/api/3a80692025db474cac03ca284684a476/products';
+      'https://crudcrud.com/api/63da88d6e4664cab88c31279e0255e38/products';
 
-  /// Fetch all products
   Future<List<Product>> fetchProducts() async {
     try {
       final response = await http.get(Uri.parse(baseUrl));
@@ -26,11 +25,10 @@ class ProductApiService {
     }
   }
 
-  /// Add a new product
   Future<Product> addProduct(Product product) async {
     try {
       final Map<String, dynamic> productJson = product.toJson();
-      productJson.remove('_id'); // Ensure `_id` is not included in the payload
+      productJson.remove('_id');
 
       final response = await http.post(
         Uri.parse(baseUrl),
@@ -56,12 +54,10 @@ class ProductApiService {
     }
   }
 
-  /// Edit an existing product
   Future<void> editProduct(String id, Product product) async {
     try {
       final Map<String, dynamic> productJson = product.toJson();
-      productJson.remove('_id'); // Ensure `_id` is not sent in the payload
-
+      productJson.remove('_id');
       final response = await http.put(
         Uri.parse('$baseUrl/$id'),
         headers: {
@@ -84,7 +80,6 @@ class ProductApiService {
     }
   }
 
-  /// Delete a product by ID
   Future<void> deleteProduct(String id) async {
     try {
       final response = await http.delete(

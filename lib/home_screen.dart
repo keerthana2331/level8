@@ -21,16 +21,17 @@ class _HomeScreenState extends State<HomeScreen> {
     _products = _apiService.fetchProducts();
   }
 
-  void _refreshData() {
+  void refreshData() {
     setState(() {
       _products = _apiService.fetchProducts();
     });
   }
 
-  // Method to show the product dialog (assuming you have the ProductDialog widget)
-  void _showProductDialog(BuildContext context, {Product? product, required VoidCallback onRefresh}) {
+  void showProductDialog(BuildContext context,
+      {Product? product, required VoidCallback onRefresh}) {
     final nameController = TextEditingController(text: product?.name ?? '');
-    final descriptionController = TextEditingController(text: product?.description ?? '');
+    final descriptionController =
+        TextEditingController(text: product?.description ?? '');
     final priceController = TextEditingController(
       text: product != null ? product.price.toStringAsFixed(2) : '',
     );
@@ -50,7 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     product == null ? 'Add Product' : 'Edit Product',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -107,12 +111,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                     ),
                     onPressed: () async {
                       final name = nameController.text.trim();
                       final description = descriptionController.text.trim();
-                      final price = double.tryParse(priceController.text) ?? 0.0;
+                      final price =
+                          double.tryParse(priceController.text) ?? 0.0;
 
                       if (product == null) {
                         await _apiService.addProduct(
@@ -154,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _logout(BuildContext context) {
+  void logout(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/login');
   }
 
@@ -170,14 +176,14 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context),
+            onPressed: () => logout(context),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showProductDialog(
+        onPressed: () => showProductDialog(
           context,
-          onRefresh: _refreshData,  // Use the refresh function here
+          onRefresh: refreshData,
         ),
         icon: const Icon(Icons.add_circle_outline),
         label: const Text('Add Product'),
@@ -248,7 +254,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(16),
                   leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                    backgroundColor:
+                        Theme.of(context).primaryColor.withOpacity(0.1),
                     child: Icon(
                       Icons.shopping_bag_outlined,
                       color: Theme.of(context).primaryColor,
@@ -282,10 +289,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
                         color: Colors.blue,
-                        onPressed: () => _showProductDialog(
+                        onPressed: () => showProductDialog(
                           context,
                           product: product,
-                          onRefresh: _refreshData,  // Use refresh here
+                          onRefresh: refreshData,
                         ),
                       ),
                       IconButton(
@@ -296,7 +303,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Delete Product'),
-                              content: const Text('Are you sure you want to delete this product?'),
+                              content: const Text(
+                                  'Are you sure you want to delete this product?'),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
@@ -304,9 +312,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    await _apiService.deleteProduct(product.id!);
+                                    await _apiService
+                                        .deleteProduct(product.id!);
                                     Navigator.pop(context);
-                                    _refreshData();  // Refresh after delete
+                                    refreshData();
                                   },
                                   child: const Text(
                                     'Delete',

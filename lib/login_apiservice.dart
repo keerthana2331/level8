@@ -47,6 +47,7 @@ Future<String?> loginUser(Loguser loginUser) async {
     return null;
   }
 }
+
 Future<Map<String, String>> getAuthHeaders() async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
@@ -58,6 +59,7 @@ Future<Map<String, String>> getAuthHeaders() async {
     return {};
   }
 }
+
 Future<void> fetchUserProfile() async {
   try {
     final headers = await getAuthHeaders();
