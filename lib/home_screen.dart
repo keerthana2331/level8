@@ -1,232 +1,330 @@
-// ignore_for_file: use_super_parameters
+// ignore_for_file: library_private_types_in_public_api, use_super_parameters, use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:leveleight/product_api.dart';
+import 'package:leveleight/product_model.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
-  final ValueNotifier<List<Map<String, String>>> productsNotifier =
-      ValueNotifier([
-    {'name': 'Product 1', 'description': 'Description of Product 1'},
-    {'name': 'Product 2', 'description': 'Description of Product 2'},
-  ]);
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
 
-  void addProduct(String name, String description) {
-    productsNotifier.value = [
-      ...productsNotifier.value,
-      {'name': name, 'description': description}
-    ];
+class _HomeScreenState extends State<HomeScreen> {
+  final ProductApiService _apiService = ProductApiService();
+  late Future<List<Product>> _products;
+
+  @override
+  void initState() {
+    super.initState();
+    _products = _apiService.fetchProducts();
   }
 
-  void editProduct(int index, String name, String description) {
-    final updatedProducts =
-        List<Map<String, String>>.from(productsNotifier.value);
-    updatedProducts[index] = {'name': name, 'description': description};
-    productsNotifier.value = updatedProducts;
+  void _refreshData() {
+    setState(() {
+      _products = _apiService.fetchProducts();
+    });
   }
 
-  void deleteProduct(int index) {
-    final updatedProducts =
-        List<Map<String, String>>.from(productsNotifier.value)..removeAt(index);
-    productsNotifier.value = updatedProducts;
-  }
-
-  void showProductDialog(BuildContext context, {int? index}) {
-    final nameController = TextEditingController(
-      text: index != null ? productsNotifier.value[index]['name'] : '',
-    );
-    final descriptionController = TextEditingController(
-      text: index != null ? productsNotifier.value[index]['description'] : '',
+  // Method to show the product dialog (assuming you have the ProductDialog widget)
+  void _showProductDialog(BuildContext context, {Product? product, required VoidCallback onRefresh}) {
+    final nameController = TextEditingController(text: product?.name ?? '');
+    final descriptionController = TextEditingController(text: product?.description ?? '');
+    final priceController = TextEditingController(
+      text: product != null ? product.price.toStringAsFixed(2) : '',
     );
 
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.grey.shade900,
-          title: Text(
-            index == null ? 'Add Product' : 'Edit Product',
-            style: const TextStyle(color: Colors.white),
-          ),
-          content: Column(
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextField(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    product == null ? 'Add Product' : 'Edit Product',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
                 controller: nameController,
-                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Product Name',
-                  labelStyle: TextStyle(color: Colors.grey.shade400),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.purple.shade300),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  prefixIcon: const Icon(Icons.add_business),
                 ),
               ),
-              TextField(
+              const SizedBox(height: 16),
+              TextFormField(
                 controller: descriptionController,
-                style: const TextStyle(color: Colors.white),
+                maxLines: 3,
                 decoration: InputDecoration(
-                  labelText: 'Product Description',
-                  labelStyle: TextStyle(color: Colors.grey.shade400),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.purple.shade300),
+                  labelText: 'Description',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  prefixIcon: const Icon(Icons.description_outlined),
                 ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: priceController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Price',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.monetization_on_outlined),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: () async {
+                      final name = nameController.text.trim();
+                      final description = descriptionController.text.trim();
+                      final price = double.tryParse(priceController.text) ?? 0.0;
+
+                      if (product == null) {
+                        await _apiService.addProduct(
+                          Product(
+                            name: name,
+                            description: description,
+                            price: price,
+                          ),
+                        );
+                      } else {
+                        await _apiService.editProduct(
+                          product.id!,
+                          Product(
+                            id: product.id,
+                            name: name,
+                            description: description,
+                            price: price,
+                          ),
+                        );
+                      }
+                      Navigator.pop(context);
+                      onRefresh();
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(product == null ? Icons.add : Icons.save),
+                        const SizedBox(width: 8),
+                        Text(product == null ? 'Add Product' : 'Save Changes'),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel',
-                  style: TextStyle(color: Colors.redAccent)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final name = nameController.text.trim();
-                final description = descriptionController.text.trim();
-
-                if (index == null) {
-                  addProduct(name, description);
-                } else {
-                  editProduct(index, name, description);
-                }
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple.shade300),
-              child: Text(index == null ? 'Add' : 'Save'),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
     );
+  }
+
+  void _logout(BuildContext context) {
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        elevation: 0,
         title: const Text(
-          'Manage Products',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.black, Colors.purple],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+          'Product Catalog',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/login');
-            },
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.black, Colors.grey],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showProductDialog(
+          context,
+          onRefresh: _refreshData,  // Use the refresh function here
         ),
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => showProductDialog(context),
-              icon: const Icon(Icons.add, color: Colors.black),
-              label: const Text(
-                'Add Product',
-                style: TextStyle(color: Colors.black),
+        icon: const Icon(Icons.add_circle_outline),
+        label: const Text('Add Product'),
+      ),
+      body: FutureBuilder<List<Product>>(
+        future: _products,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 60,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error: ${snapshot.error}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ],
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple.shade300,
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 60,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'No products available',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final product = snapshot.data![index];
+              return Card(
+                elevation: 2,
+                margin: const EdgeInsets.only(bottom: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ValueListenableBuilder<List<Map<String, String>>>(
-                valueListenable: productsNotifier,
-                builder: (context, products, child) {
-                  return ListView.builder(
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      final product = products[index];
-                      return Card(
-                        color: Colors.grey.shade800,
-                        elevation: 5,
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(16),
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                    child: Icon(
+                      Icons.shopping_bag_outlined,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  title: Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      Text(product.description),
+                      const SizedBox(height: 8),
+                      Text(
+                        '\$${product.price.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Colors.purple,
-                            child:
-                                Icon(Icons.shopping_bag, color: Colors.white),
-                          ),
-                          title: Text(
-                            product['name']!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.white,
+                      ),
+                    ],
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined),
+                        color: Colors.blue,
+                        onPressed: () => _showProductDialog(
+                          context,
+                          product: product,
+                          onRefresh: _refreshData,  // Use refresh here
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        color: Colors.red,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Delete Product'),
+                              content: const Text('Are you sure you want to delete this product?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    await _apiService.deleteProduct(product.id!);
+                                    Navigator.pop(context);
+                                    _refreshData();  // Refresh after delete
+                                  },
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          subtitle: Text(
-                            product['description']!,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit,
-                                    color: Colors.orangeAccent),
-                                onPressed: () =>
-                                    showProductDialog(context, index: index),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete,
-                                    color: Colors.redAccent),
-                                onPressed: () {
-                                  deleteProduct(index);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      backgroundColor: Colors.redAccent,
-                                      content: Text(
-                                          '${product['name']} deleted successfully'),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

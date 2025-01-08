@@ -1,59 +1,39 @@
-// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors
-
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:iconly/iconly.dart';
 import 'dart:math' as math;
 
-class FirstScreen extends StatelessWidget {
+class ShoppingHomePage extends StatelessWidget {
+  const ShoppingHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0A0A0A),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: AnimatedBuilder(
-              animation: Listenable.merge([
-                AlwaysStoppedAnimation(0),
-              ]),
-              builder: (context, child) {
-                return CustomPaint(
-                  size: MediaQuery.of(context).size,
-                  painter: OrbsPainter(
-                      DateTime.now().millisecondsSinceEpoch % 10000 / 10000),
-                );
-              },
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.purple, Colors.pink, Colors.orange],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25),
-              child: Column(
-                children: [
-                  SizedBox(height: 40),
-                  Expanded(
-                    child: buildMainContent(context),
-                  ),
-                  SizedBox(height: 30),
-                ],
+        ),
+        child: Stack(
+          children: [
+            buildParticles(),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    buildLogo(),
+                    const SizedBox(height: 40),
+                    buildAuthButtons(context),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget buildMainContent(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        buildLogo(),
-        SizedBox(height: 50),
-        buildAuthButtons(context),
-      ],
     );
   }
 
@@ -61,31 +41,46 @@ class FirstScreen extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(25),
+          width: 120,
+          height: 120,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
             shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-              width: 2,
+            gradient: const LinearGradient(
+              colors: [Colors.purple, Colors.pink, Colors.orange],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.purple.withOpacity(0.3),
+                blurRadius: 15,
+                spreadRadius: 5,
+              ),
+            ],
           ),
-          child: Icon(
-            IconlyBold.bag_2,
-            size: 50,
+          child: const Icon(
+            Icons.shopping_bag_outlined,
+            size: 60,
             color: Colors.white,
           ),
         ),
-        SizedBox(height: 20),
-        Text(
+        const SizedBox(height: 24),
+        const Text(
           'SHOPPING CART',
-          style: GoogleFonts.syncopate(
-            fontSize: 23,
+          style: TextStyle(
+            fontSize: 32,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            letterSpacing: 8,
+            letterSpacing: 2,
+            shadows: [
+              Shadow(
+                color: Colors.black26,
+                offset: Offset(0, 2),
+                blurRadius: 4,
+              ),
+            ],
           ),
-        ).animate().fadeIn().slideY(begin: 0.3).then().shimmer(delay: 400.ms),
+        ),
       ],
     );
   }
@@ -93,145 +88,90 @@ class FirstScreen extends StatelessWidget {
   Widget buildAuthButtons(BuildContext context) {
     return Column(
       children: [
-        buildPrimaryButton(
-          'Create Account',
-          IconlyBold.add_user,
-          [Color(0xFF8A2BE2), Color(0xFF4B0082)],
-          () => Navigator.pushNamed(context, '/signup'),
+        buildButton(
+          text: 'Create Account',
+          onPressed: () => Navigator.pushNamed(context, '/signup'),
+          isPrimary: true,
         ),
-        SizedBox(height: 15),
-        buildSecondaryButton(
-          'LOGIN',
-          IconlyBold.login,
-          () => Navigator.pushNamed(context, '/login'),
+        const SizedBox(height: 16),
+        buildButton(
+          text: 'Login',
+          onPressed: () => Navigator.pushNamed(context, '/login'),
+          isPrimary: false,
         ),
       ],
     );
   }
 
-  Widget buildPrimaryButton(
-      String text, IconData icon, List<Color> colors, VoidCallback onPressed) {
+  Widget buildButton({
+    required String text,
+    required VoidCallback onPressed,
+    required bool isPrimary,
+  }) {
     return Container(
       width: double.infinity,
-      height: 60,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: colors),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: colors[0].withOpacity(0.3),
-            blurRadius: 20,
-            offset: Offset(0, 10),
+      height: 56,
+      decoration: isPrimary
+          ? BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              gradient: const LinearGradient(
+                colors: [Colors.white, Colors.white70],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 15,
+                  spreadRadius: 1,
+                ),
+              ],
+            )
+          : BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white70, width: 2),
+            ),
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
           ),
-        ],
-      ),
-      child: MaterialButton(
-        onPressed: onPressed,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              text,
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 18,
+            color: isPrimary ? Colors.purple : Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-    )
-        .animate()
-        .fadeIn()
-        .slideX(begin: -0.2, end: 0)
-        .then()
-        .shimmer(delay: 2.seconds);
-  }
-
-  Widget buildSecondaryButton(
-      String text, IconData icon, VoidCallback onPressed) {
-    return Container(
-      width: double.infinity,
-      height: 60,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-        ),
-      ),
-      child: MaterialButton(
-        onPressed: onPressed,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              text,
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.2, end: 0);
-  }
-}
-
-class OrbsPainter extends CustomPainter {
-  final double animation;
-
-  OrbsPainter(this.animation);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    void drawOrb(double x, double y, Color color, double radius) {
-      final gradient = RadialGradient(
-        colors: [
-          color.withOpacity(0.3),
-          color.withOpacity(0),
-        ],
-      );
-
-      final rect = Rect.fromCircle(
-        center: Offset(x, y),
-        radius: radius,
-      );
-
-      paint.shader = gradient.createShader(rect);
-      canvas.drawCircle(Offset(x, y), radius, paint);
-    }
-
-    drawOrb(
-      size.width * (0.5 + math.cos(animation * 2 * math.pi) * 0.2),
-      size.height * (0.3 + math.sin(animation * 2 * math.pi) * 0.1),
-      Colors.purple,
-      size.width * 0.4,
-    );
-
-    drawOrb(
-      size.width * (0.5 + math.cos((animation + 0.4) * 2 * math.pi) * 0.2),
-      size.height * (0.6 + math.sin((animation + 0.4) * 2 * math.pi) * 0.1),
-      Colors.blue,
-      size.width * 0.3,
     );
   }
 
-  @override
-  bool shouldRepaint(OrbsPainter oldDelegate) => true;
+  Widget buildParticles() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          children: List.generate(
+            20,
+            (index) => Positioned(
+              left: math.Random().nextDouble() * constraints.maxWidth,
+              top: math.Random().nextDouble() * constraints.maxHeight,
+              child: Container(
+                width: 4,
+                height: 4,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.3),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

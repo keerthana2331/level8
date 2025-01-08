@@ -44,6 +44,7 @@ dependencies:
   email_validator: ^3.0.0
   http: ^1.2.2
   animate_do: ^3.3.4
+  flutter_svg: ^2.0.16
 
 dev_dependencies:
   flutter_test:

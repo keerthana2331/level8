@@ -1,16 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:leveleight/login_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'login_model.dart';
 
 Future<String?> loginUser(Loguser loginUser) async {
   const String url = 'https://sampleapi.stackmod.info/api/v1/auth/login';
-
   try {
     print('Initiating login request...');
     print('Request URL: $url');
     print('Request body: ${jsonEncode(loginUser.toJson())}');
-
     final response = await http
         .post(
       Uri.parse(url),
@@ -20,20 +18,15 @@ Future<String?> loginUser(Loguser loginUser) async {
         .timeout(Duration(seconds: 20), onTimeout: () {
       throw 'The request timed out. Please try again.';
     });
-
     print('Response status code: ${response.statusCode}');
     print('Response body: ${response.body}');
-
     if (response.statusCode == 200 || response.statusCode == 201) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-
       if (responseData.containsKey('accessToken')) {
         final String accessToken = responseData['accessToken'];
-
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', accessToken);
         print('Login successful. Token saved.');
-
         return accessToken;
       } else {
         print('Login failed: Token not found in response.');
@@ -54,11 +47,9 @@ Future<String?> loginUser(Loguser loginUser) async {
     return null;
   }
 }
-
 Future<Map<String, String>> getAuthHeaders() async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
-
   if (token != null && token.isNotEmpty) {
     print('Auth token found: $token');
     return {'Authorization': 'Bearer $token'};
@@ -67,11 +58,9 @@ Future<Map<String, String>> getAuthHeaders() async {
     return {};
   }
 }
-
 Future<void> fetchUserProfile() async {
   try {
     final headers = await getAuthHeaders();
-
     if (headers.isNotEmpty) {
       final response = await http
           .get(
@@ -81,7 +70,6 @@ Future<void> fetchUserProfile() async {
           .timeout(Duration(seconds: 20), onTimeout: () {
         throw 'The request timed out. Please try again.';
       });
-
       if (response.statusCode == 200) {
         print('Profile data: ${response.body}');
       } else {

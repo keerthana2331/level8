@@ -1,9 +1,9 @@
-// ignore_for_file: prefer_const_constructors, unused_local_variable, use_key_in_widget_constructors, library_private_types_in_public_api, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:leveleight/sign_model.dart';
 import 'package:leveleight/signup_api.dart';
 import 'package:email_validator/email_validator.dart';
-import 'sign_model.dart';
 
 class SignupScreen extends StatelessWidget {
   final formKey = GlobalKey<FormState>();
@@ -12,80 +12,37 @@ class SignupScreen extends StatelessWidget {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
-  String? validateFirstName(String? value) => value == null || value.isEmpty
-      ? 'Please enter your first name'
-      : value.length < 2
-          ? 'Name must be at least 2 characters'
-          : null;
-
-  String? validateEmail(String? value) => value == null || value.isEmpty
-      ? 'Please enter your email'
-      : !EmailValidator.validate(value)
-          ? 'Please enter a valid email'
-          : null;
-
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) return 'Please enter your password';
-    if (value.length < 8) return 'Password must be at least 8 characters';
-    if (!value.contains(RegExp(r'[A-Z]')))
-      return 'Password must contain at least one uppercase letter';
-    if (!value.contains(RegExp(r'[0-9]')))
-      return 'Password must contain at least one number';
-    return null;
-  }
-
-  String? validatePhone(String? value) => value == null || value.isEmpty
-      ? 'Please enter your phone number'
-      : !RegExp(r'^\+?[\d\s-]{10,}$').hasMatch(value)
-          ? 'Please enter a valid phone number'
-          : null;
+  SignupScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1A1A1A),
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Text(
-          'Create Account',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pushReplacementNamed(context, '/'),
-        ),
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
+            colors: [
+              Colors.purple.shade800,
+              Colors.blue.shade900,
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2E1F6D),
-              Color(0xFF1A1A1A),
-            ],
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24.0),
               child: Form(
                 key: formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(height: 20),
-                    buildInputForm(),
-                    SizedBox(height: 24),
-                    buildSignUpButton(context),
-                    SizedBox(height: 12),
-                    buildBackToHomeButton(context),
+                    buildHeader(),
+                    const SizedBox(height: 40),
+                    buildFormFields(),
+                    const SizedBox(height: 32),
+                    buildSignupButton(context),
+                    buildBackButton(context),
                   ],
                 ),
               ),
@@ -96,150 +53,255 @@ class SignupScreen extends StatelessWidget {
     );
   }
 
-  Widget buildInputForm() {
+  Widget buildHeader() {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.person_add_rounded,
+            size: 50,
+            color: Colors.white.withOpacity(0.9),
+          ),
+        ),
+        const SizedBox(height: 24),
+        const Text(
+          'Create Account',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Please fill in the details below',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.white.withOpacity(0.8),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildFormFields() {
+    return Column(
+      children: [
+        buildTextField(
+          controller: firstNameController,
+          labelText: 'Full Name',
+          icon: Icons.person_outline,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your first name';
+            }
+            if (value.length < 2) {
+              return 'Name must be at least 2 characters';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 20),
+        buildTextField(
+          controller: emailController,
+          labelText: 'Email Address',
+          icon: Icons.email_outlined,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your email';
+            }
+            if (!EmailValidator.validate(value)) {
+              return 'Please enter a valid email';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 20),
+        buildTextField(
+          controller: passwordController,
+          labelText: 'Password',
+          icon: Icons.lock_outline,
+          obscureText: true,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your password';
+            }
+            if (value.length < 8) {
+              return 'Password must be at least 8 characters';
+            }
+            if (!value.contains(RegExp(r'[A-Z]'))) {
+              return 'Password must contain at least one uppercase letter';
+            }
+            if (!value.contains(RegExp(r'[0-9]'))) {
+              return 'Password must contain at least one number';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 20),
+        buildTextField(
+          controller: phoneController,
+          labelText: 'Phone Number',
+          icon: Icons.phone_outlined,
+          keyboardType: TextInputType.phone,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your phone number';
+            }
+            if (!RegExp(r'^\+?[\d\s-]{7,15}$').hasMatch(value)) {
+              return 'Please enter a valid phone number';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData icon,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    required String? Function(String?) validator,
+  }) {
     return Container(
-      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF2A2A2A),
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+          prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.8)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Colors.white, width: 2),
+          ),
+          errorStyle: const TextStyle(color: Colors.orange),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 16,
+            horizontal: 20,
+          ),
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
+  Widget buildSignupButton(BuildContext context) {
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade400, Colors.purple.shade400],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
-            blurRadius: 15,
-            offset: Offset(0, 5),
+            color: Colors.blue.shade900.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          TextFormField(
-            controller: firstNameController,
-            style: TextStyle(color: Colors.white),
-            decoration:
-                buildInputDecoration('First Name', Icons.person_outline),
-            validator: validateFirstName,
+      child: ElevatedButton(
+        onPressed: () => handleSignup(context),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          SizedBox(height: 16),
-          TextFormField(
-            controller: emailController,
-            style: TextStyle(color: Colors.white),
-            decoration: buildInputDecoration('Email', Icons.email_outlined),
-            validator: validateEmail,
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            controller: passwordController,
-            style: TextStyle(color: Colors.white),
-            obscureText: true,
-            decoration: buildInputDecoration('Password', Icons.lock_outline),
-            validator: validatePassword,
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            controller: phoneController,
-            style: TextStyle(color: Colors.white),
-            keyboardType: TextInputType.phone,
-            decoration:
-                buildInputDecoration('Phone Number', Icons.phone_outlined),
-            validator: validatePhone,
-          ),
-        ],
-      ),
-    );
-  }
-
-  InputDecoration buildInputDecoration(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(color: Colors.grey[400]),
-      prefixIcon: Icon(icon, color: Colors.grey[400]),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[700]!),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[700]!),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Color(0xFF6448FE)),
-      ),
-      filled: true,
-      fillColor: Color(0xFF363636),
-    );
-  }
-
-  Widget buildSignUpButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () async {
-        if (formKey.currentState!.validate()) {
-          try {
-            String? responseMessage = await signupUser(User(
-              fullname: firstNameController.text,
-              email: emailController.text,
-              password: passwordController.text,
-              phone: phoneController.text,
-            ));
-
-            if (responseMessage == "Number already exists") {
-              showErrorSnackBar(context,
-                  "Phone number already exists. Please use a different number.");
-            } else {
-              showSuccessSnackBar(context, responseMessage!);
-              Navigator.pushNamed(context, '/otp',
-                  arguments: emailController.text);
-            }
-          } catch (e) {
-            showErrorSnackBar(context, 'Signup failed: $e');
-          }
-        } else {
-          showErrorSnackBar(context, 'Please correct the errors in the form.');
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFF6448FE),
-        padding: EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
         ),
-        elevation: 5,
-      ),
-      child: Text(
-        'Sign Up',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+        child: const Text(
+          'Sign Up',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );
   }
 
-  Widget buildBackToHomeButton(BuildContext context) {
+  Widget buildBackButton(BuildContext context) {
     return TextButton(
       onPressed: () => Navigator.pushReplacementNamed(context, '/'),
       child: Text(
         'Back to Home',
-        style: TextStyle(color: Colors.grey[400]),
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.8),
+          fontSize: 16,
+        ),
       ),
     );
   }
 
-  void showErrorSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red[700],
-      ),
-    );
+  void handleSignup(BuildContext context) async {
+    if (formKey.currentState!.validate()) {
+      try {
+        String? responseMessage = await signupUser(User(
+          fullname: firstNameController.text,
+          email: emailController.text,
+          password: passwordController.text,
+          phone: phoneController.text,
+        ));
+        if (responseMessage == "Number already exists") {
+          showSnackBar(
+            context,
+            "Phone number already exists. Please use a different number.",
+            Colors.orange,
+          );
+        } else {
+          showSnackBar(context, responseMessage!, Colors.green);
+          Navigator.pushNamed(
+            context,
+            '/verify',
+            arguments: emailController.text,
+          );
+        }
+      } catch (e) {
+        showSnackBar(context, 'Signup failed: $e', Colors.red);
+      }
+    } else {
+      showSnackBar(
+        context,
+        'Please correct the errors in the form.',
+        Colors.orange,
+      );
+    }
   }
 
-  void showSuccessSnackBar(BuildContext context, String message) {
+  void showSnackBar(BuildContext context, String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.green[700],
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }

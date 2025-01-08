@@ -1,31 +1,34 @@
 class Product {
-  String id;
+  String? id; // Use nullable to handle cases where id might not be present
   String name;
   String description;
   double price;
-  String imageUrl;
 
   Product({
-    required this.id,
+    this.id,
     required this.name,
     required this.description,
     required this.price,
-    required this.imageUrl,
   });
 
+  /// Factory method to create a Product from JSON
   factory Product.fromJson(Map<String, dynamic> json) => Product(
-        id: json['id'],
+        id: json['_id'], // Map `_id` to `id`
         name: json['name'],
         description: json['description'],
-        price: json['price'].toDouble(),
-        imageUrl: json['imageUrl'],
+        price: (json['price'] as num).toDouble(), 
       );
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'description': description,
-        'price': price,
-        'imageUrl': imageUrl,
-      };
+  /// Convert a Product object to JSON
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {
+      'name': name,
+      'description': description,
+      'price': price,
+    };
+    if (id != null) {
+      data['_id'] = id; 
+    }
+    return data;
+  }
 }
